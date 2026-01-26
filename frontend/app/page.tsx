@@ -5,7 +5,6 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import Card from '@/components/Card';
 import { getWaterQualityData, WaterQualityData } from '@/lib/api';
 import { Droplets, Activity, AlertTriangle, Radio } from 'lucide-react';
-import { connectSocket } from '@/lib/socket';
 
 interface MetricCardProps {
   title: string;
@@ -44,22 +43,11 @@ export default function Home() {
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 30000); // Refresh every 30s
-
-    const socket = connectSocket();
-    socket.on('waterQuality', (newData: WaterQualityData) => {
-      setLatestData(newData);
-      setData((prev) => [...prev.slice(-49), newData]);
-    });
-
-    socket.on('deviceStatus', (status: { deviceId: string; status: string }) => {
-      setDeviceStatus(status.status);
-    });
+    // Poll for new data every 30 seconds (Vercel compatible)
+    const interval = setInterval(loadData, 30000);
 
     return () => {
       clearInterval(interval);
-      socket.off('waterQuality');
-      socket.off('deviceStatus');
     };
   }, []);
 
@@ -68,10 +56,16 @@ export default function Home() {
       const result = await getWaterQualityData({ limit: 50 });
       setData(result);
       if (result.length > 0) {
-        setLatestData(result[result.length - 1]);
+        setLatestData(result[0]);
+        // Check if device is online (data received in last 5 minutes)
+        const lastUpdate = new Date(result[0].timestamp);
+        const now = new Date();
+        const diffMinutes = (now.getTime() - lastUpdate.getTime()) / (1000 * 60);
+        setDeviceStatus(diffMinutes < 5 ? 'online' : 'offline');
       }
     } catch (error) {
       console.error('Failed to load data:', error);
+      setDeviceStatus('offline');
     }
   };
 
@@ -157,57 +151,6 @@ export default function Home() {
           </LineChart>
         </ResponsiveContainer>
       </Card>
-    </div>
-  );
-}
-
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
     </div>
   );
 }

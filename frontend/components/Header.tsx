@@ -2,21 +2,26 @@
 
 import { Bell, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { connectSocket } from '@/lib/socket';
+import { getAlerts } from '@/lib/api';
 
 export default function Header() {
   const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
-    const socket = connectSocket();
-
-    socket.on('alert', () => {
-      setNotificationCount((prev) => prev + 1);
-    });
-
-    return () => {
-      socket.off('alert');
+    // Poll for new alerts instead of WebSocket (Vercel compatible)
+    const checkAlerts = async () => {
+      try {
+        const alerts = await getAlerts({ acknowledged: false });
+        setNotificationCount(alerts.length);
+      } catch (error) {
+        console.error('Failed to fetch alerts:', error);
+      }
     };
+
+    checkAlerts();
+    const interval = setInterval(checkAlerts, 30000); // Check every 30s
+
+    return () => clearInterval(interval);
   }, []);
 
   return (

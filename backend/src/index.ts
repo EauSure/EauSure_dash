@@ -2,8 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { config } from 'dotenv';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
 import waterQualityRouter from './routes/waterQuality.js';
 import devicesRouter from './routes/devices.js';
 import alertsRouter from './routes/alerts.js';
@@ -14,18 +12,14 @@ import logger from './utils/logger.js';
 config();
 
 const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-    methods: ['GET', 'POST'],
-  },
-});
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false, // Vercel compatibility
+}));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 }));
 app.use(express.json());
 
@@ -35,47 +29,73 @@ app.use('/api/devices', devicesRouter);
 app.use('/api/alerts', alertsRouter);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Initialize services
-const initServices = async () => {
-  try {
-    await initDatabase();
-    await initMQTT(io);
-    logger.info('All services initialized successfully');
-  } catch (error) {
-    logger.error('Failed to initialize services:', error);
-    process.exit(1);
-  }
-};
-
-// Socket.IO connection handling
-io.on('connection', (socket) => {
-  logger.info(`Client connected: ${socket.id}`);
-
-  socket.on('disconnect', () => {
-    logger.info(`Client disconnected: ${socket.id}`);
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Water Quality Monitoring API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      waterQuality: '/api/water-quality',
+      devices: '/api/devices',
+      alerts: '/api/alerts'
+    }
   });
 });
 
-// Export io for use in other modules
-export { io };
+// Initialize services (singleton pattern for serverless)
+let initialized = false;
+const initServices = async () => {
+  if (initialized) return;
+  
+  try {
+    await initDatabase();
+    // MQTT initialization without Socket.IO
+    if (process.env.MQTT_BROKER) {
+      await initMQTT();
+    }
+    initialized = true;
+    logger.info('All services initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize services:', error);
+    // Don't exit in serverless environment
+    if (process.env.NODE_ENV !== 'production') {
+      throw error;
+    }
+  }
+};
 
-// Start server (for local development)
-const PORT = process.env.PORT || 3000;
+// Middleware to ensure services are initialized
+app.use(async (req, res, next) => {
+  try {
+    await initServices();
+    next();
+  } catch (error) {
+    logger.error('Service initialization error:', error);
+    res.status(503).json({ error: 'Service temporarily unavailable' });
+  }
+});
 
+// Error handling middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  logger.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// Start server (for local development only)
 if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3000;
   initServices().then(() => {
-    httpServer.listen(PORT, () => {
+    app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
     });
-  });
-} else {
-  // For Vercel serverless
-  initServices().catch((error) => {
-    logger.error('Failed to initialize services:', error);
+  }).catch((error) => {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
   });
 }
 

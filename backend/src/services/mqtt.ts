@@ -1,11 +1,10 @@
 import mqtt from 'mqtt';
-import type { Server } from 'socket.io';
 import logger from '../utils/logger.js';
 import { saveWaterQualityData, createAlert } from './database.js';
 
 let mqttClient: mqtt.MqttClient | null = null;
 
-export const initMQTT = async (io: Server): Promise<void> => {
+export const initMQTT = async (): Promise<void> => {
   const MQTT_BROKER = process.env.MQTT_BROKER || 'mqtt://localhost:1883';
   const MQTT_USERNAME = process.env.MQTT_USERNAME || '';
   const MQTT_PASSWORD = process.env.MQTT_PASSWORD || '';
@@ -36,7 +35,7 @@ export const initMQTT = async (io: Server): Promise<void> => {
 
       // Parse ChirpStack uplink message
       if (topic.includes('/event/up')) {
-        await handleUplinkMessage(payload, io);
+        await handleUplinkMessage(payload);
       }
     } catch (error) {
       logger.error('Error processing MQTT message:', error);
@@ -52,7 +51,7 @@ export const initMQTT = async (io: Server): Promise<void> => {
   });
 };
 
-const handleUplinkMessage = async (payload: any, io: Server): Promise<void> => {
+const handleUplinkMessage = async (payload: any): Promise<void> => {
   const deviceId = payload.deviceInfo?.devEui || 'unknown';
   const data = payload.data ? Buffer.from(payload.data, 'base64') : null;
 
@@ -80,9 +79,7 @@ const handleUplinkMessage = async (payload: any, io: Server): Promise<void> => {
     };
 
     await saveWaterQualityData(waterQualityData);
-    
-    // Emit to connected clients
-    io.emit('waterQuality', waterQualityData);
+    logger.info(`Water quality data saved: pH=${ph.toFixed(2)}, TDS=${tds}ppm`);
     
     // Check for water quality alerts
     if (ph < 6.5 || ph > 8.5 || tds > 500) {
@@ -92,7 +89,7 @@ const handleUplinkMessage = async (payload: any, io: Server): Promise<void> => {
         message: `Qualité d'eau anormale détectée: pH=${ph.toFixed(2)}, TDS=${tds}ppm`,
         deviceId,
       });
-      io.emit('alert', alert);
+      logger.warn(`Water quality alert created: ${alert.message}`);
     }
   } else if (messageType === 0x02) {
     // Fall detection alert
@@ -102,12 +99,8 @@ const handleUplinkMessage = async (payload: any, io: Server): Promise<void> => {
       message: 'ALERTE CRITIQUE: Chute détectée dans le puits!',
       deviceId,
     });
-    io.emit('alert', alert);
     logger.warn(`Fall detection alert from device ${deviceId}`);
   }
-
-  // Update device status
-  io.emit('deviceStatus', { deviceId, status: 'online' });
 };
 
 export const getMQTTClient = (): mqtt.MqttClient | null => {

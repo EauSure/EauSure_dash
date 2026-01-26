@@ -4,21 +4,17 @@ import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import { getAlerts, Alert } from '@/lib/api';
 import { AlertTriangle, Droplet } from 'lucide-react';
-import { connectSocket } from '@/lib/socket';
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
   useEffect(() => {
     loadAlerts();
-
-    const socket = connectSocket();
-    socket.on('alert', (newAlert: Alert) => {
-      setAlerts((prev) => [newAlert, ...prev]);
-    });
+    // Poll for new alerts every 30 seconds (Vercel compatible)
+    const interval = setInterval(loadAlerts, 30000);
 
     return () => {
-      socket.off('alert');
+      clearInterval(interval);
     };
   }, []);
 
@@ -68,7 +64,7 @@ export default function AlertsPage() {
                 className={`border-l-4 p-4 rounded-r-lg ${getSeverityColor(alert.severity)}`}
               >
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 mr-3">{getAlertIcon(alert.type)}</div>
+                  <div className="shrink-0 mr-3">{getAlertIcon(alert.type)}</div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h4 className="font-semibold">{alert.message}</h4>
