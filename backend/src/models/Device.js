@@ -1,17 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
-export interface IDevice extends Document {
-  deviceId: string;
-  name: string;
-  location: string;
-  status: 'online' | 'offline';
-  battery: number;
-  lastSeen: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const DeviceSchema = new Schema<IDevice>(
+const DeviceSchema = new Schema(
   {
     deviceId: {
       type: String,
@@ -48,4 +38,4 @@ const DeviceSchema = new Schema<IDevice>(
   }
 );
 
-export default mongoose.model<IDevice>('Device', DeviceSchema);
+export default mongoose.model('Device', DeviceSchema);

@@ -6,7 +6,7 @@ import WaterQuality from '../models/WaterQuality.js';
 import Alert from '../models/Alert.js';
 
 // MongoDB connection
-const connectMongoDB = async (): Promise<void> => {
+const connectMongoDB = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI;
     if (!mongoURI) {
@@ -30,7 +30,7 @@ const redisClient = createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379',
 });
 
-export const initDatabase = async (): Promise<void> => {
+export const initDatabase = async () => {
   try {
     // Connect to MongoDB
     await connectMongoDB();
@@ -56,13 +56,7 @@ export const initDatabase = async (): Promise<void> => {
   }
 };
 
-export const saveWaterQualityData = async (data: {
-  deviceId: string;
-  ph: number;
-  tds: number;
-  battery: number;
-  timestamp: string;
-}): Promise<void> => {
+export const saveWaterQualityData = async (data) => {
   try {
     // Save water quality data
     const waterQuality = new WaterQuality({
@@ -94,14 +88,9 @@ export const saveWaterQualityData = async (data: {
   }
 };
 
-export const getWaterQualityData = async (params: {
-  deviceId?: string;
-  startTime?: string;
-  endTime?: string;
-  limit?: number;
-}): Promise<any[]> => {
+export const getWaterQualityData = async (params) => {
   try {
-    const query: any = {};
+    const query = {};
 
     if (params.deviceId) {
       query.deviceId = params.deviceId;
@@ -122,7 +111,7 @@ export const getWaterQualityData = async (params: {
       .limit(params.limit || 50)
       .lean();
 
-    return results.map((row: any) => ({
+    return results.map((row) => ({
       timestamp: row.timestamp.toISOString(),
       deviceId: row.deviceId,
       ph: row.ph,
@@ -134,10 +123,10 @@ export const getWaterQualityData = async (params: {
   }
 };
 
-export const getDevices = async (): Promise<any[]> => {
+export const getDevices = async () => {
   try {
     const devices = await Device.find().sort({ lastSeen: -1 }).lean();
-    return devices.map((device: any) => ({
+    return devices.map((device) => ({
       id: device.deviceId,
       name: device.name,
       location: device.location,
@@ -151,12 +140,7 @@ export const getDevices = async (): Promise<any[]> => {
   }
 };
 
-export const createAlert = async (alert: {
-  type: string;
-  severity: string;
-  message: string;
-  deviceId: string;
-}): Promise<any> => {
+export const createAlert = async (alert) => {
   try {
     const newAlert = new Alert({
       type: alert.type,
@@ -182,12 +166,9 @@ export const createAlert = async (alert: {
   }
 };
 
-export const getAlerts = async (params?: {
-  acknowledged?: boolean;
-  severity?: string;
-}): Promise<any[]> => {
+export const getAlerts = async (params) => {
   try {
-    const query: any = {};
+    const query = {};
 
     if (params?.acknowledged !== undefined) {
       query.acknowledged = params.acknowledged;
@@ -201,7 +182,7 @@ export const getAlerts = async (params?: {
       .limit(100)
       .lean();
 
-    return alerts.map((alert: any) => ({
+    return alerts.map((alert) => ({
       id: alert._id.toString(),
       type: alert.type,
       severity: alert.severity,
@@ -216,7 +197,7 @@ export const getAlerts = async (params?: {
   }
 };
 
-export const acknowledgeAlert = async (alertId: string): Promise<any> => {
+export const acknowledgeAlert = async (alertId) => {
   try {
     const alert = await Alert.findByIdAndUpdate(
       alertId,

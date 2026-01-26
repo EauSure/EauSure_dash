@@ -2,9 +2,9 @@ import mqtt from 'mqtt';
 import logger from '../utils/logger.js';
 import { saveWaterQualityData, createAlert } from './database.js';
 
-let mqttClient: mqtt.MqttClient | null = null;
+let mqttClient = null;
 
-export const initMQTT = async (): Promise<void> => {
+export const initMQTT = async () => {
   const MQTT_BROKER = process.env.MQTT_BROKER || 'mqtt://localhost:1883';
   const MQTT_USERNAME = process.env.MQTT_USERNAME || '';
   const MQTT_PASSWORD = process.env.MQTT_PASSWORD || '';
@@ -51,7 +51,7 @@ export const initMQTT = async (): Promise<void> => {
   });
 };
 
-const handleUplinkMessage = async (payload: any): Promise<void> => {
+const handleUplinkMessage = async (payload) => {
   const deviceId = payload.deviceInfo?.devEui || 'unknown';
   const data = payload.data ? Buffer.from(payload.data, 'base64') : null;
 
@@ -103,6 +103,6 @@ const handleUplinkMessage = async (payload: any): Promise<void> => {
   }
 };
 
-export const getMQTTClient = (): mqtt.MqttClient | null => {
+export const getMQTTClient = () => {
   return mqttClient;
 };

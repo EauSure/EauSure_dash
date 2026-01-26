@@ -1,15 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
-export interface IAlert extends Document {
-  type: 'fall_detection' | 'water_quality' | 'device_offline';
-  severity: 'critical' | 'warning' | 'info';
-  message: string;
-  deviceId: string;
-  timestamp: Date;
-  acknowledged: boolean;
-}
-
-const AlertSchema = new Schema<IAlert>(
+const AlertSchema = new Schema(
   {
     type: {
       type: String,
@@ -52,4 +44,4 @@ const AlertSchema = new Schema<IAlert>(
 // Index for efficient alert queries
 AlertSchema.index({ acknowledged: 1, severity: 1, timestamp: -1 });
 
-export default mongoose.model<IAlert>('Alert', AlertSchema);
+export default mongoose.model('Alert', AlertSchema);

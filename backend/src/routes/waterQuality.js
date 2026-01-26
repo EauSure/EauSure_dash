@@ -8,10 +8,10 @@ router.get('/', async (req, res) => {
     const { deviceId, startTime, endTime, limit } = req.query;
     
     const data = await getWaterQualityData({
-      deviceId: deviceId as string,
-      startTime: startTime as string,
-      endTime: endTime as string,
-      limit: limit ? parseInt(limit as string) : 50,
+      deviceId,
+      startTime,
+      endTime,
+      limit: limit ? parseInt(limit) : 50,
     });
 
     res.json(data);

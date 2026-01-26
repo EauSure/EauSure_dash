@@ -1,14 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
-export interface IWaterQuality extends Document {
-  deviceId: string;
-  ph: number;
-  tds: number;
-  battery: number;
-  timestamp: Date;
-}
-
-const WaterQualitySchema = new Schema<IWaterQuality>(
+const WaterQualitySchema = new Schema(
   {
     deviceId: {
       type: String,
@@ -50,4 +43,4 @@ const WaterQualitySchema = new Schema<IWaterQuality>(
 // Index for efficient time-based queries
 WaterQualitySchema.index({ deviceId: 1, timestamp: -1 });
 
-export default mongoose.model<IWaterQuality>('WaterQuality', WaterQualitySchema);
+export default mongoose.model('WaterQuality', WaterQualitySchema);

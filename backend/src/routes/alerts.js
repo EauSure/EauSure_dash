@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     
     const alerts = await getAlerts({
       acknowledged: acknowledged === 'true',
-      severity: severity as string,
+      severity,
     });
 
     res.json(alerts);
