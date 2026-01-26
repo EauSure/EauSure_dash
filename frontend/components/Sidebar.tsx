@@ -1,4 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Home, Radio, Bell } from 'lucide-react';
 
 const navigation = [
@@ -8,7 +9,7 @@ const navigation = [
 ];
 
 export default function Sidebar() {
-  const location = useLocation();
+  const pathname = usePathname();
 
   return (
     <div className="flex flex-col w-64 bg-white border-r border-gray-200">
@@ -18,11 +19,11 @@ export default function Sidebar() {
       <nav className="flex-1 px-4 py-4 space-y-2">
         {navigation.map((item) => {
           const Icon = item.icon;
-          const isActive = location.pathname === item.href;
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
-              to={item.href}
+              href={item.href}
               className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
                 isActive
                   ? 'bg-primary text-white'

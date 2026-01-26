@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAlerts, pgPool } from '../services/database.js';
+import { getAlerts, acknowledgeAlert } from '../services/database.js';
 
 const router = Router();
 
@@ -21,16 +21,13 @@ router.get('/', async (req, res) => {
 router.patch('/:id/acknowledge', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pgPool.query(
-      'UPDATE alerts SET acknowledged = true WHERE id = $1 RETURNING *',
-      [id]
-    );
+    const result = await acknowledgeAlert(id);
 
-    if (result.rows.length === 0) {
+    if (!result) {
       return res.status(404).json({ error: 'Alert not found' });
     }
 
-    res.json(result.rows[0]);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: 'Failed to acknowledge alert' });
   }

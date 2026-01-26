@@ -2,12 +2,17 @@
 
 ## 🎯 Démarrer le projet en 5 minutes
 
-### 1. Lancer l'infrastructure Docker
-```bash
-docker-compose up -d
-```
+### 1. Configurer les services cloud (une seule fois)
 
-Attendez que tous les services démarrent (environ 30-60 secondes).
+**MongoDB Atlas** (gratuit) :
+1. https://www.mongodb.com/cloud/atlas
+2. Créez un cluster M0 (gratuit)
+3. Copiez l'URI de connexion
+
+**Upstash Redis** (gratuit) :
+1. https://upstash.com/
+2. Créez une base Redis
+3. Copiez l'URL Redis
 
 ### 2. Copier les fichiers d'environnement
 ```bash
@@ -20,48 +25,72 @@ cd ..\frontend
 copy .env.example .env
 ```
 
-### 3. Démarrer le Backend
+### 3. Installer les dépendances
+```bash
+# Backend
+cd backend
+npm install
+
+# Frontend
+cd frontend
+npm install
+```
+
+### 4. Démarrer en développement
+
+**Terminal 1 - Backend:**
 ```bash
 cd backend
 npm run dev
 ```
 
-Le backend démarrera sur http://localhost:3000
-
-### 4. Démarrer le Frontend (nouveau terminal)
+**Terminal 2 - Frontend:**
 ```bash
 cd frontend
 npm run dev
 ```
 
-Le frontend démarrera sur http://localhost:5173
+### 5. Accéder à l'application
 
-### 5. Accéder aux interfaces
-
-- **Dashboard Web**: http://localhost:5173
-- **ChirpStack (LoRaWAN)**: http://localhost:8080 (admin/admin)
-- **Grafana**: http://localhost:3001 (admin/admin)
+- **Dashboard Web**: http://localhost:3000
+- **API Backend**: http://localhost:3000/api
 
 ## ✅ Vérification
 
-Ouvrez http://localhost:5173 - Vous devriez voir le dashboard de surveillance de la qualité de l'eau.
+Ouvrez http://localhost:3000 - Vous devriez voir le dashboard de surveillance de la qualité de l'eau.
 
 ## 🔧 Configuration ChirpStack (Optionnel)
+� Déployer sur Vercel
 
-Si vous avez des dispositifs LoRaWAN:
+### Déploiement en 2 commandes
 
-1. Accédez à http://localhost:8080
-2. Créez une application "Water Quality"
-3. Ajoutez vos dispositifs avec leurs DevEUI
-4. Les données apparaîtront automatiquement dans le dashboard
+```bash
+# Frontend
+cd frontend
+vercel
+
+# Backend
+cd backend
+vercel
+```
+
+Configurez les variables d'environnement dans le dashboard Vercel.
+
+📖 **Guide détaillé** : [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)
 
 ## 🐛 Dépannage
 
-### Les services Docker ne démarrent pas
-```bash
-docker-compose logs -f
-```
+### Le backend ne se connecte pas à MongoDB
+- Vérifiez votre URI MongoDB Atlas
+- Autorisez l'IP 0.0.0.0/0 dans MongoDB Atlas Network Access
 
+### Erreur de connexion Redis
+- Vérifiez l'URL Upstash Redis
+- Testez la connexion depuis le dashboard Upstash
+
+### Le frontend ne peut pas se connecter au backend
+- Vérifiez que `NEXT_PUBLIC_API_URL` est correctement configuré
+- Vérifiez le CORS dans le backend
 ### Le backend ne se connecte pas aux bases de données
 Vérifiez que tous les conteneurs Docker sont en cours d'exécution:
 ```bash

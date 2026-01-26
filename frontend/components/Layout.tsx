@@ -1,12 +1,13 @@
-import { ReactNode } from 'react';
-import Sidebar from './Sidebar';
-import Header from './Header';
+'use client';
 
-interface LayoutProps {
-  children: ReactNode;
-}
+import Sidebar from '@/components/Sidebar';
+import Header from '@/components/Header';
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />

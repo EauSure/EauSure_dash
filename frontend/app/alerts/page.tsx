@@ -1,20 +1,12 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
-import { getAlerts } from '@/services/api';
+import { getAlerts, Alert } from '@/lib/api';
 import { AlertTriangle, Droplet } from 'lucide-react';
-import { connectSocket } from '@/services/socket';
+import { connectSocket } from '@/lib/socket';
 
-interface Alert {
-  id: string;
-  type: 'fall_detection' | 'water_quality' | 'device_offline';
-  severity: 'critical' | 'warning' | 'info';
-  message: string;
-  deviceId: string;
-  timestamp: string;
-  acknowledged: boolean;
-}
-
-export default function Alerts() {
+export default function AlertsPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
   useEffect(() => {

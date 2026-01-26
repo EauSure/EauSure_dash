@@ -1,37 +1,21 @@
-import { Influx } from 'influx';
-import pkg from 'pg';
-const { Pool } = pkg;
+import mongoose from 'mongoose';
 import { createClient } from 'redis';
 import logger from '../utils/logger.js';
+import Device from '../models/Device.js';
+import WaterQuality from '../models/WaterQuality.js';
+import Alert from '../models/Alert.js';
 
-// InfluxDB client
-const influx = new Influx.InfluxDB({
-  host: process.env.INFLUXDB_HOST || 'localhost',
-  port: parseInt(process.env.INFLUXDB_PORT || '8086'),
-  database: process.env.INFLUXDB_DB || 'water_quality',
-  username: process.env.INFLUXDB_USER || 'admin',
-  password: process.env.INFLUXDB_PASSWORD || 'admin',
-  schema: [
-    {
-      measurement: 'water_quality',
-      fields: {
-        ph: Influx.FieldType.FLOAT,
-        tds: Influx.FieldType.INTEGER,
-        battery: Influx.FieldType.INTEGER,
-      },
-      tags: ['deviceId'],
-    },
-  ],
-});
-
-// PostgreSQL client
-const pgPool = new Pool({
-  host: process.env.POSTGRES_HOST || 'localhost',
-  port: parseInt(process.env.POSTGRES_PORT || '5432'),
-  database: process.env.POSTGRES_DB || 'water_quality',
-  user: process.env.POSTGRES_USER || 'postgres',
-  password: process.env.POSTGRES_PASSWORD || 'postgres',
-});
+// MongoDB connection
+const connectMongoDB = async (): Promise<void> => {
+  try {
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://admin:admin123@localhost:27017/water_quality?authSource=admin';
+    await mongoose.connect(mongoURI);
+    logger.info('MongoDB connected successfully');
+  } catch (error) {
+    logger.error('MongoDB connection error:', error);
+    throw error;
+  }
+};
 
 // Redis client
 const redisClient = createClient({
@@ -40,39 +24,8 @@ const redisClient = createClient({
 
 export const initDatabase = async (): Promise<void> => {
   try {
-    // Initialize InfluxDB
-    const databases = await influx.getDatabaseNames();
-    if (!databases.includes(process.env.INFLUXDB_DB || 'water_quality')) {
-      await influx.createDatabase(process.env.INFLUXDB_DB || 'water_quality');
-      logger.info('InfluxDB database created');
-    }
-
-    // Initialize PostgreSQL tables
-    await pgPool.query(`
-      CREATE TABLE IF NOT EXISTS devices (
-        id VARCHAR(255) PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        location VARCHAR(255),
-        status VARCHAR(50) DEFAULT 'offline',
-        battery INTEGER,
-        last_seen TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    await pgPool.query(`
-      CREATE TABLE IF NOT EXISTS alerts (
-        id SERIAL PRIMARY KEY,
-        type VARCHAR(50) NOT NULL,
-        severity VARCHAR(20) NOT NULL,
-        message TEXT NOT NULL,
-        device_id VARCHAR(255) REFERENCES devices(id),
-        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        acknowledged BOOLEAN DEFAULT FALSE
-      );
-    `);
-
-    logger.info('PostgreSQL tables initialized');
+    // Connect to MongoDB
+    await connectMongoDB();
 
     // Connect to Redis
     await redisClient.connect();
@@ -91,27 +44,30 @@ export const saveWaterQualityData = async (data: {
   timestamp: string;
 }): Promise<void> => {
   try {
-    await influx.writePoints([
-      {
-        measurement: 'water_quality',
-        tags: { deviceId: data.deviceId },
-        fields: {
-          ph: data.ph,
-          tds: data.tds,
-          battery: data.battery,
-        },
-        timestamp: new Date(data.timestamp),
-      },
-    ]);
+    // Save water quality data
+    const waterQuality = new WaterQuality({
+      deviceId: data.deviceId,
+      ph: data.ph,
+      tds: data.tds,
+      battery: data.battery,
+      timestamp: new Date(data.timestamp),
+    });
+    await waterQuality.save();
 
-    // Update device status in PostgreSQL
-    await pgPool.query(
-      `INSERT INTO devices (id, name, location, status, battery, last_seen)
-       VALUES ($1, $2, $3, 'online', $4, $5)
-       ON CONFLICT (id) DO UPDATE
-       SET status = 'online', battery = $4, last_seen = $5`,
-      [data.deviceId, `Device ${data.deviceId}`, 'Unknown', data.battery, new Date(data.timestamp)]
+    // Update or create device
+    await Device.findOneAndUpdate(
+      { deviceId: data.deviceId },
+      {
+        deviceId: data.deviceId,
+        name: `Device ${data.deviceId}`,
+        status: 'online',
+        battery: data.battery,
+        lastSeen: new Date(data.timestamp),
+      },
+      { upsert: true, new: true }
     );
+
+    logger.info(`Water quality data saved for device ${data.deviceId}`);
   } catch (error) {
     logger.error('Error saving water quality data:', error);
     throw error;
@@ -125,32 +81,29 @@ export const getWaterQualityData = async (params: {
   limit?: number;
 }): Promise<any[]> => {
   try {
-    let query = 'SELECT * FROM water_quality';
-    const conditions: string[] = [];
+    const query: any = {};
 
     if (params.deviceId) {
-      conditions.push(`"deviceId" = '${params.deviceId}'`);
-    }
-    if (params.startTime) {
-      conditions.push(`time >= '${params.startTime}'`);
-    }
-    if (params.endTime) {
-      conditions.push(`time <= '${params.endTime}'`);
+      query.deviceId = params.deviceId;
     }
 
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
+    if (params.startTime || params.endTime) {
+      query.timestamp = {};
+      if (params.startTime) {
+        query.timestamp.$gte = new Date(params.startTime);
+      }
+      if (params.endTime) {
+        query.timestamp.$lte = new Date(params.endTime);
+      }
     }
 
-    query += ' ORDER BY time DESC';
+    const results = await WaterQuality.find(query)
+      .sort({ timestamp: -1 })
+      .limit(params.limit || 50)
+      .lean();
 
-    if (params.limit) {
-      query += ` LIMIT ${params.limit}`;
-    }
-
-    const results = await influx.query(query);
     return results.map((row: any) => ({
-      timestamp: row.time.toISOString(),
+      timestamp: row.timestamp.toISOString(),
       deviceId: row.deviceId,
       ph: row.ph,
       tds: row.tds,
@@ -163,8 +116,15 @@ export const getWaterQualityData = async (params: {
 
 export const getDevices = async (): Promise<any[]> => {
   try {
-    const result = await pgPool.query('SELECT * FROM devices ORDER BY last_seen DESC');
-    return result.rows;
+    const devices = await Device.find().sort({ lastSeen: -1 }).lean();
+    return devices.map((device: any) => ({
+      id: device.deviceId,
+      name: device.name,
+      location: device.location,
+      status: device.status,
+      battery: device.battery,
+      lastSeen: device.lastSeen.toISOString(),
+    }));
   } catch (error) {
     logger.error('Error querying devices:', error);
     return [];
@@ -178,13 +138,24 @@ export const createAlert = async (alert: {
   deviceId: string;
 }): Promise<any> => {
   try {
-    const result = await pgPool.query(
-      `INSERT INTO alerts (type, severity, message, device_id)
-       VALUES ($1, $2, $3, $4)
-       RETURNING *`,
-      [alert.type, alert.severity, alert.message, alert.deviceId]
-    );
-    return result.rows[0];
+    const newAlert = new Alert({
+      type: alert.type,
+      severity: alert.severity,
+      message: alert.message,
+      deviceId: alert.deviceId,
+      timestamp: new Date(),
+    });
+    await newAlert.save();
+    
+    return {
+      id: newAlert._id.toString(),
+      type: newAlert.type,
+      severity: newAlert.severity,
+      message: newAlert.message,
+      deviceId: newAlert.deviceId,
+      timestamp: newAlert.timestamp.toISOString(),
+      acknowledged: newAlert.acknowledged,
+    };
   } catch (error) {
     logger.error('Error creating alert:', error);
     throw error;
@@ -196,32 +167,61 @@ export const getAlerts = async (params?: {
   severity?: string;
 }): Promise<any[]> => {
   try {
-    let query = 'SELECT * FROM alerts';
-    const conditions: string[] = [];
-    const values: any[] = [];
-    let paramIndex = 1;
+    const query: any = {};
 
     if (params?.acknowledged !== undefined) {
-      conditions.push(`acknowledged = $${paramIndex++}`);
-      values.push(params.acknowledged);
+      query.acknowledged = params.acknowledged;
     }
     if (params?.severity) {
-      conditions.push(`severity = $${paramIndex++}`);
-      values.push(params.severity);
+      query.severity = params.severity;
     }
 
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
-    }
+    const alerts = await Alert.find(query)
+      .sort({ timestamp: -1 })
+      .limit(100)
+      .lean();
 
-    query += ' ORDER BY timestamp DESC LIMIT 100';
-
-    const result = await pgPool.query(query, values);
-    return result.rows;
+    return alerts.map((alert: any) => ({
+      id: alert._id.toString(),
+      type: alert.type,
+      severity: alert.severity,
+      message: alert.message,
+      deviceId: alert.deviceId,
+      timestamp: alert.timestamp.toISOString(),
+      acknowledged: alert.acknowledged,
+    }));
   } catch (error) {
     logger.error('Error querying alerts:', error);
     return [];
   }
 };
 
-export { influx, pgPool, redisClient };
+export const acknowledgeAlert = async (alertId: string): Promise<any> => {
+  try {
+    const alert = await Alert.findByIdAndUpdate(
+      alertId,
+      { acknowledged: true },
+      { new: true }
+    ).lean();
+
+    if (!alert) {
+      return null;
+    }
+
+    return {
+      id: alert._id.toString(),
+      type: alert.type,
+      severity: alert.severity,
+      message: alert.message,
+      deviceId: alert.deviceId,
+      timestamp: alert.timestamp.toISOString(),
+      acknowledged: alert.acknowledged,
+    };
+  } catch (error) {
+    logger.error('Error acknowledging alert:', error);
+    throw error;
+  }
+};
+
+export { redisClient };
+

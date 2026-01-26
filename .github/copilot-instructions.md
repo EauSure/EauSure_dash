@@ -4,14 +4,15 @@
 This is an IoT water quality monitoring system for wells and deep reservoirs with LoRaWAN connectivity.
 
 ## Technology Stack
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
+- **Frontend**: Next.js 16 + TypeScript + Tailwind CSS
 - **Backend**: Node.js + Express + TypeScript
-- **Databases**: InfluxDB (time-series), PostgreSQL (relational), Redis (cache)
+- **Database**: MongoDB (with time-series collections)
+- **Cache**: Redis
 - **IoT Infrastructure**: ChirpStack LoRaWAN, Mosquitto MQTT
 - **Monitoring**: Grafana
 - **DevOps**: Docker Compose
 
 ## Project Structure
-- `/frontend` - React dashboard application
-- `/backend` - Express API server
+- `/frontend` - Next.js application with App Router
+- `/backend` - Express API server with Mongoose
 - `/docker` - Docker Compose and service configurations

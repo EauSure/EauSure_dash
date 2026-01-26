@@ -6,24 +6,21 @@ Système IoT autonome de surveillance de la qualité de l'eau pour puits et rés
 ## 🏗️ Architecture
 
 ### Stack Technique
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
-- **Backend**: Node.js + Express + TypeScript
-- **Bases de données**:
-  - InfluxDB - Données de séries temporelles (capteurs)
-  - PostgreSQL - Données relationnelles (dispositifs, alertes)
-  - Redis - Cache et gestion temps réel
-- **IoT**: ChirpStack LoRaWAN + Mosquitto MQTT
-- **Monitoring**: Grafana
-- **DevOps**: Docker Compose
+- **Frontend**: Next.js 16 + TypeScript + Tailwind CSS (Vercel)
+- **Backend**: Node.js + Express + TypeScript (Vercel Serverless)
+- **Base de données**: MongoDB Atlas (Cloud)
+- **Cache**: Redis Cloud / Upstash
+- **IoT**: ChirpStack Cloud ou The Things Network + MQTT Cloud
+- **Déploiement**: Vercel (Frontend + Backend)
 
 ### Fonctionnalités
 - ✅ Surveillance en temps réel du pH et TDS
 - ✅ Détection de chute avec alerte critique (MPU6050)
-- ✅ Dashboard interactif avec graphiques temps réel
+- ✅ Dashboard Next.js avec Server Components et Client Components
 - ✅ Gestion des dispositifs LoRaWAN
 - ✅ Système d'alertes multi-niveaux
 - ✅ Communication WebSocket pour notifications instantanées
-- ✅ Historique des données avec InfluxDB
+- ✅ Stockage optimisé avec MongoDB Time-Series Collections
 - ✅ Support FUOTA (Firmware Update Over The Air)
 
 ## 🚀 Installation
@@ -58,7 +55,7 @@ cp .env.example .env
 ### 3. Démarrer l'infrastructure Docker
 
 ```bash
-# Démarrer tous les services (ChirpStack, InfluxDB, PostgreSQL, Redis, Mosquitto, Grafana)
+# Démarrer tous les services (ChirpStack, MongoDB, Redis, Mosquitto, Grafana)
 docker-compose up -d
 
 # Vérifier que tous les conteneurs sont en cours d'exécution
@@ -68,8 +65,7 @@ docker-compose ps
 **Services disponibles:**
 - ChirpStack UI: http://localhost:8080
 - Grafana: http://localhost:3001 (admin/admin)
-- InfluxDB: http://localhost:8086
-- PostgreSQL: localhost:5432
+- MongoDB: localhost:27017
 - Redis: localhost:6379
 - MQTT Broker: localhost:1883
 
@@ -103,23 +99,22 @@ npm run dev
 
 L'application sera accessible sur:
 - Frontend: http://localhost:5173
-- Backend API: http://localhost:3000
-
+- Backend API: http://localho3000
+- Backend API: http://localhost:3000/api
 ## 📁 Structure du Projet
 
 ```
 pfedash/
 ├── frontend/                 # Application React
-│   ├── src/
-│   │   ├── components/      # Composants réutilisables
-│   │   ├── pages/           # Pages principales
-│   │   ├── services/        # API et WebSocket
-│   │   └── App.tsx
+│   ├── src/Next.js
+│   ├── app/                 # App Router (pages)
+│   ├── components/          # Composants réutilisables
+│   ├── lib/                 # Services (API, WebSocket)
 │   └── package.json
 │
 ├── backend/                  # API Node.js
 │   ├── src/
-│   │   ├── routes/          # Routes API
+│   │   ├── models/          # Modèles Mongooseroutes/          # Routes API
 │   │   ├── services/        # Services (MQTT, Database)
 │   │   └── index.ts
 │   └── package.json
@@ -132,22 +127,22 @@ pfedash/
 └── docker-compose.yml        # Orchestration des services
 ```
 
-## 🔧 Configuration ChirpStack
+## 🔧 Configuration LoRaWAN
 
-### 1. Accéder à ChirpStack
-Ouvrez http://localhost:8080 et connectez-vous:
-- Username: `admin`
-- Password: `admin`
+### Option 1 : The Things Network (Gratuit)
+1. Créez un compte sur https://www.thethingsnetwork.org/
+2. Créez une application
+3. Enregistrez vos dispositifs avec leur DevEUI
+4. Configurez l'intégration MQTT
 
-### 2. Créer une Application
-1. Allez dans Applications → Add Application
-2. Nom: "Water Quality Monitoring"
-3. Configurez l'intégration MQTT
+### Option 2 : ChirpStack Cloud
+1. Utilisez ChirpStack Cloud (payant)
+2. Ou déployez ChirpStack localement avec un tunnel (ngrok)
 
-### 3. Ajouter vos dispositifs
-1. Dans votre application, cliquez sur "Add Device"
-2. Entrez le DevEUI de votre ESP32-S3
-3. Configurez le Device Profile (LoRaWAN 1.0.3 ou 1.1)
+### Ajouter vos dispositifs
+1. Enregistrez le DevEUI de votre ESP32-S3
+2. Configurez le Device Profile (LoRaWAN 1.0.3 ou 1.1)
+3. Notez les clés AppKey et NwkKey
 
 ### 4. Format des données
 
@@ -170,8 +165,8 @@ Byte 1-6: Données accéléromètre (optionnel)
 1. Accédez à http://localhost:3001
 2. Login: `admin` / `admin`
 3. Les datasources sont déjà configurées (InfluxDB + PostgreSQL)
-4. Créez vos propres dashboards ou importez des templates
-
+4. Configurez la datasource MongoDB
+4. Créez vos propres dashboard
 ## 🔌 API Endpoints
 
 ### Qualité de l'eau
@@ -191,12 +186,13 @@ Byte 1-6: Données accéléromètre (optionnel)
 
 ## 🛠️ Développement
 
-### Build pour production
+### Build local
 
 **Frontend:**
 ```bash
 cd frontend
 npm run build
+npm start
 ```
 
 **Backend:**
@@ -210,6 +206,9 @@ npm start
 ```bash
 npm run lint
 ```
+
+### Déploiement automatique
+Chaque push sur GitHub déclenche un déploiement automatique sur Vercel.
 
 ## 📱 Dispositif IoT (ESP32-S3)
 

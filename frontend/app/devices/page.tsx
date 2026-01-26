@@ -1,18 +1,11 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
-import { getDevices } from '@/services/api';
+import { getDevices, Device } from '@/lib/api';
 import { Radio, Battery, MapPin } from 'lucide-react';
 
-interface Device {
-  id: string;
-  name: string;
-  location: string;
-  status: 'online' | 'offline';
-  battery: number;
-  lastSeen: string;
-}
-
-export default function Devices() {
+export default function DevicesPage() {
   const [devices, setDevices] = useState<Device[]>([]);
 
   useEffect(() => {

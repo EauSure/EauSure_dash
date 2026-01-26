@@ -63,11 +63,21 @@ io.on('connection', (socket) => {
 // Export io for use in other modules
 export { io };
 
-// Start server
+// Start server (for local development)
 const PORT = process.env.PORT || 3000;
 
-initServices().then(() => {
-  httpServer.listen(PORT, () => {
-    logger.info(`Server running on port ${PORT}`);
+if (process.env.NODE_ENV !== 'production') {
+  initServices().then(() => {
+    httpServer.listen(PORT, () => {
+      logger.info(`Server running on port ${PORT}`);
+    });
   });
-});
+} else {
+  // For Vercel serverless
+  initServices().catch((error) => {
+    logger.error('Failed to initialize services:', error);
+  });
+}
+
+// Export for Vercel serverless
+export default app;

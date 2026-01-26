@@ -14,45 +14,34 @@
 │   Gateway DIY   │
 │   (LoRaWAN)     │
 └────────┬────────┘
-         │ IP/Ethernet
+         │ Internet
          ▼
 ┌─────────────────┐
-│  ChirpStack     │◄──── Configuration Web UI
-│  LoRa Server    │
+│ The Things      │◄──── Console Web (gratuit)
+│ Network / TTN   │
 └────────┬────────┘
-         │ MQTT
-         ▼
-┌─────────────────┐
-│   Mosquitto     │
-│   MQTT Broker   │
-└────────┬────────┘
-         │
+         │ MQTT / Webhooks
          ▼
 ┌─────────────────┐      ┌──────────────┐
-│   Backend API   │◄────►│  InfluxDB    │
-│  (Node.js +     │      │  (Séries     │
-│   WebSocket)    │      │   temp.)     │
-└────────┬────────┘      └──────────────┘
-         │               ┌──────────────┐
-         ├──────────────►│  PostgreSQL  │
-         │               │  (Relational)│
-         │               └──────────────┘
-         │               ┌──────────────┐
-         └──────────────►│    Redis     │
-                         │   (Cache)    │
+│   Backend API   │◄────►│ MongoDB Atlas│
+│  (Vercel        │      │   (Cloud)    │
+│   Serverless)   │      └──────────────┘
+└────────┬────────┘      ┌──────────────┐
+         └──────────────►│ Upstash Redis│
+                         │   (Cloud)    │
                          └──────────────┘
          │
          ▼
 ┌─────────────────┐
-│   Frontend      │
+│    Next.js      │
 │   Dashboard     │
-│  (React + WS)   │
+│ (Vercel Deploy) │
 └─────────────────┘
          │
          ▼
 ┌─────────────────┐
-│    Grafana      │◄──── Dashboards avancés
-│   Monitoring    │
+│ MongoDB Atlas   │◄──── Monitoring intégré
+│   Dashboard     │
 └─────────────────┘
 ```
 
@@ -60,20 +49,20 @@
 
 ### 1. Données de Capteurs (Mesure normale)
 ```
-ESP32 → LoRa → Gateway → ChirpStack → MQTT → Backend → InfluxDB
+ESP32 → LoRa → Gateway → ChirpStack → MQTT → Backend → MongoDB
                                                ↓
-                                           WebSocket → Frontend
+                                           WebSocket → Next.js
 ```
 
 ### 2. Alerte de Chute Détectée
 ```
 MPU6050 → ESP32 → LoRa → Gateway → ChirpStack → MQTT → Backend
                                                           ↓
-                                                    PostgreSQL (alerte)
+                                                    MongoDB (alerte)
                                                           ↓
                                                       WebSocket
                                                           ↓
-                                                    Frontend (notification)
+                                                     Next.js (notification)
 ```
 
 ## Composants
@@ -88,21 +77,23 @@ MPU6050 → ESP32 → LoRa → Gateway → ChirpStack → MQTT → Backend
 - **Alimentation**: Batteries Li-SOCl2 (8-10 ans)
 - **Mode**: Deep-sleep avec Wake-on-Motion
 
-### Infrastructure Backend
-- **ChirpStack**: Serveur LoRaWAN (gestion devices, FUOTA)
-- **Mosquitto**: Broker MQTT pour communication temps réel
-- **Node.js API**: 
+### Infrastructure Cloud
+- **The Things Network**: Serveur LoRaWAN gratuit (gestion devices)
+- **HiveMQ Cloud / MQTT Cloud**: Broker MQTT cloud
+- **Node.js API (Vercel Serverless)**: 
   - Routes REST pour données historiques
-  - WebSocket pour notifications temps réel
   - Décodage des payloads LoRa
   - Logique d'alertes
-- **Bases de données**:
-  - InfluxDB: Stockage optimisé séries temporelles
-  - PostgreSQL: Dispositifs, alertes, utilisateurs
-  - Redis: Cache, sessions, pub/sub
+  - Alternative WebSocket : Pusher ou Ably
+- **Bases de données Cloud**:
+  - MongoDB Atlas: Collections time-series pour données capteurs
+  - MongoDB Atlas: Collections classiques pour devices et alertes
+  - Upstash Redis: Cache, sessions
 
 ### Frontend
-- **React + TypeScript**: Interface utilisateur
+- **Next.js + TypeScript**: App Router moderne
+- **Server Components**: Optimisation des performances
+- **Client Components**: Interactivité (charts, WebSocket)
 - **Recharts**: Graphiques temps réel
 - **React-Leaflet**: Carte des puits
 - **WebSocket**: Mises à jour en direct
@@ -155,9 +146,10 @@ Offset | Length | Type   | Description
 
 ## Scalabilité
 
-- Multi-dispositifs supporté
-- MQTT pub/sub pour distribution
-- InfluxDB optimisé pour millions de points
+- MongoDB time-series optimisé pour IoT
+- Redis pour mise en cache
+- Docker Compose pour déploiement simple
+- Next.js avec edge runtime readynts
 - Redis pour mise en cache
 - Docker Compose pour déploiement simple
 
