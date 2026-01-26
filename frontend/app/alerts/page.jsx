@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
-import { getAlerts, Alert } from '@/lib/api';
+import { getAlerts } from '@/lib/api';
 import { AlertTriangle, Droplet } from 'lucide-react';
 
 export default function AlertsPage() {
-  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
     loadAlerts();
@@ -27,7 +27,7 @@ export default function AlertsPage() {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
+  const getSeverityColor = (severity) => {
     switch (severity) {
       case 'critical':
         return 'bg-red-100 text-red-800 border-red-200';
@@ -40,7 +40,7 @@ export default function AlertsPage() {
     }
   };
 
-  const getAlertIcon = (type: string) => {
+  const getAlertIcon = (type) => {
     switch (type) {
       case 'fall_detection':
         return <AlertTriangle className="w-5 h-5" />;

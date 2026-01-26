@@ -3,11 +3,7 @@
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 
-export default function Layout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function Layout({ children }) {
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />

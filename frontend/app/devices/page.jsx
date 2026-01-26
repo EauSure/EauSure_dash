@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
-import { getDevices, Device } from '@/lib/api';
+import { getDevices } from '@/lib/api';
 import { Radio, Battery, MapPin } from 'lucide-react';
 
 export default function DevicesPage() {
-  const [devices, setDevices] = useState<Device[]>([]);
+  const [devices, setDevices] = useState([]);
 
   useEffect(() => {
     loadDevices();

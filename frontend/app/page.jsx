@@ -3,18 +3,10 @@
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Card from '@/components/Card';
-import { getWaterQualityData, WaterQualityData } from '@/lib/api';
+import { getWaterQualityData } from '@/lib/api';
 import { Droplets, Activity, AlertTriangle, Radio } from 'lucide-react';
 
-interface MetricCardProps {
-  title: string;
-  value: string;
-  unit: string;
-  icon: React.ReactNode;
-  status: 'good' | 'warning' | 'danger';
-}
-
-function MetricCard({ title, value, unit, icon, status }: MetricCardProps) {
+function MetricCard({ title, value, unit, icon, status }) {
   const statusColors = {
     good: 'bg-green-100 text-green-800 border-green-200',
     warning: 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -37,9 +29,9 @@ function MetricCard({ title, value, unit, icon, status }: MetricCardProps) {
 }
 
 export default function Home() {
-  const [data, setData] = useState<WaterQualityData[]>([]);
-  const [latestData, setLatestData] = useState<WaterQualityData | null>(null);
-  const [deviceStatus, setDeviceStatus] = useState<string>('online');
+  const [data, setData] = useState([]);
+  const [latestData, setLatestData] = useState(null);
+  const [deviceStatus, setDeviceStatus] = useState('online');
 
   useEffect(() => {
     loadData();
