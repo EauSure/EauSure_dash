@@ -485,15 +485,23 @@ MIT License - Voir fichier `LICENSE`
 
 ---
 
-## 👥 Contributeurs
+## 👥 Authors
 
-- **Développeur Principal**: [Votre Nom]
-- **Stack**: Next.js + Express + MongoDB + LoRaWAN
-- **Déploiement**: Vercel Serverless
+### 👤 **Adam Farjeoui** 
+
+- 🌐 Website: [https://farjeoui-portfolio.vercel.app](https://farjeoui-portfolio.vercel.app)
+- 💻 Github: [@adam-dev-hub](https://github.com/adam-dev-hub)
+- 💼 LinkedIn: [@Adam Al Farjeoui](https://linkedin.com/in/adam-al-farjeoui)
+
+### 👤 **Med Rayen Trabelsi**
+
+- 🌐 Website: [https://www.trabelsimedrayen.tech](https://www.trabelsimedrayen.tech)
+- 💻 Github: [@Mohamed Rayen Trabelsi](https://github.com/Mohamed-Rayen-Trabelsi)
+- 💼 LinkedIn: [@Mohamed Rayen Trabelsi](https://linkedin.com/in/mohamed-rayen-trabelsi)
 
 ---
 
-## ⭐ Remerciements
+## ⭐ Show Your Support
 
 - **The Things Network** pour l'infrastructure LoRaWAN gratuite
 - **Vercel** pour l'hébergement serverless
