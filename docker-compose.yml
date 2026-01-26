@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: water-quality-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: water_quality
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - water-quality-network
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: water-quality-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - water-quality-network
+    restart: unless-stopped
+
+  # Mosquitto MQTT Broker
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: water-quality-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./docker/mosquitto/config:/mosquitto/config
+      - ./docker/mosquitto/data:/mosquitto/data
+      - ./docker/mosquitto/log:/mosquitto/log
+    networks:
+      - water-quality-network
+    restart: unless-stopped
+
+  # ChirpStack Network Server (PostgreSQL)
+  chirpstack-postgres:
+    image: postgres:15-alpine
+    container_name: chirpstack-postgres
+    environment:
+      POSTGRES_DB: chirpstack
+      POSTGRES_USER: chirpstack
+      POSTGRES_PASSWORD: chirpstack
+    volumes:
+      - chirpstack_postgres_data:/var/lib/postgresql/data
+    networks:
+      - water-quality-network
+    restart: unless-stopped
+
+  # ChirpStack Server
+  chirpstack:
+    image: chirpstack/chirpstack:4
+    container_name: chirpstack-server
+    depends_on:
+      - chirpstack-postgres
+      - mosquitto
+      - redis
+    environment:
+      POSTGRESQL__DSN: postgres://chirpstack:chirpstack@chirpstack-postgres/chirpstack?sslmode=disable
+      REDIS__SERVERS: redis://redis:6379
+      INTEGRATION__MQTT__SERVER: tcp://mosquitto:1883
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./docker/chirpstack:/etc/chirpstack
+    networks:
+      - water-quality-network
+    restart: unless-stopped
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: water-quality-grafana
+    depends_on:
+      - mongodb
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-mongodb-datasource
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - water-quality-network
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  mongodb_config:
+  redis_data:
+  chirpstack_postgres_data:
+  grafana_data:
+
+networks:
+  water-quality-network:
+    driver: bridge

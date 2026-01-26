@@ -1,0 +1,25 @@
+# ChirpStack configuration
+# This file will be mounted to the ChirpStack container
+
+[general]
+log_level=4
+
+[postgresql]
+dsn="postgres://chirpstack:chirpstack@chirpstack-postgres/chirpstack?sslmode=disable"
+automigrate=true
+
+[redis]
+servers=["redis://redis:6379"]
+
+[network]
+net_id="000000"
+
+[api]
+bind="0.0.0.0:8080"
+
+[integration.mqtt]
+server="tcp://mosquitto:1883"
+json=true
+
+[monitoring]
+bind="0.0.0.0:8070"
