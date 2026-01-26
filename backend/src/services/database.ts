@@ -8,12 +8,20 @@ import Alert from '../models/Alert.js';
 // MongoDB connection
 const connectMongoDB = async (): Promise<void> => {
   try {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://admin:admin123@localhost:27017/water_quality?authSource=admin';
+    const mongoURI = process.env.MONGODB_URI;
+    if (!mongoURI) {
+      logger.warn('MONGODB_URI not configured - running without database');
+      return;
+    }
     await mongoose.connect(mongoURI);
     logger.info('MongoDB connected successfully');
   } catch (error) {
     logger.error('MongoDB connection error:', error);
-    throw error;
+    if (process.env.NODE_ENV === 'production') {
+      throw error;
+    } else {
+      logger.warn('Continuing without MongoDB in development mode');
+    }
   }
 };
 
@@ -27,12 +35,24 @@ export const initDatabase = async (): Promise<void> => {
     // Connect to MongoDB
     await connectMongoDB();
 
-    // Connect to Redis
-    await redisClient.connect();
-    logger.info('Redis connected');
+    // Connect to Redis (optional in development)
+    if (process.env.REDIS_URL) {
+      try {
+        await redisClient.connect();
+        logger.info('Redis connected');
+      } catch (error) {
+        logger.warn('Redis connection failed - continuing without cache:', error);
+      }
+    } else {
+      logger.warn('REDIS_URL not configured - running without cache');
+    }
   } catch (error) {
     logger.error('Database initialization error:', error);
-    throw error;
+    if (process.env.NODE_ENV === 'production') {
+      throw error;
+    } else {
+      logger.warn('Continuing in development mode despite database errors');
+    }
   }
 };
 
