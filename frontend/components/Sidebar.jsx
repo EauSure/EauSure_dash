@@ -53,27 +53,16 @@ export default function Sidebar() {
               <Link
                 href={item.href}
                 title={isCollapsed ? item.name : ''}
-                className={`flex items-center text-sm font-medium rounded-xl overflow-hidden ${
+                className={`flex items-center text-sm font-medium rounded-xl ${
                   isCollapsed ? 'w-12 h-12 justify-center p-0' : 'w-full justify-start px-4 py-3'
                 } ${
                   isActive
                     ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg scale-105'
                     : 'text-gray-300 hover:bg-white/10 hover:text-white hover:scale-102'
                 }`}
-                style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" style={{ transition: 'none' }} />
-                <span 
-                  className="whitespace-nowrap overflow-hidden"
-                  style={{
-                    opacity: isCollapsed ? 0 : 1,
-                    maxWidth: isCollapsed ? '0px' : '200px',
-                    marginLeft: isCollapsed ? '0px' : '12px',
-                    transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  }}
-                >
-                  {item.name}
-                </span>
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                {!isCollapsed && <span className="whitespace-nowrap ml-3">{item.name}</span>}
               </Link>
             </div>
           );
