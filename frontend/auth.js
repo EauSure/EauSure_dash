@@ -1,8 +1,8 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
-// Use relative path for same-origin API calls
-const API_URL = '/api';
+// Use full URL for server-side fetch (localhost for dev, env var for production)
+const API_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -14,7 +14,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const res = await fetch(`${API_URL}/auth/login`, {
+          const res = await fetch(`${API_URL}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
