@@ -19,6 +19,7 @@
     "mongodb": "^6.3.0",
     "mongoose": "^8.1.0",
     "mqtt": "^5.3.4",
+    "react-easy-crop": "^5.5.6",
     "redis": "^4.6.12",
     "winston": "^3.11.0"
   },

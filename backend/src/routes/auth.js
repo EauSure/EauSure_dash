@@ -59,6 +59,10 @@ router.post('/login', async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        avatar: user.avatar,
+        phone: user.phone,
+        organization: user.organization,
+        isProfileComplete: user.isProfileComplete,
       },
     });
   } catch (error) {
@@ -166,6 +170,63 @@ router.get('/me', async (req, res) => {
 router.post('/logout', (req, res) => {
   // In JWT-based auth, logout is handled client-side by removing the token
   res.json({ message: 'Logged out successfully' });
+});
+
+// PUT /api/auth/profile - Update user profile
+router.put('/profile', async (req, res) => {
+  try {
+    // Get token from header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const token = authHeader.substring(7);
+
+    // Verify token
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Get updates from request body
+    const { name, avatar, phone, organization, isProfileComplete } = req.body;
+
+    // Find and update user
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Update fields if provided
+    if (name !== undefined) user.name = name;
+    if (avatar !== undefined) user.avatar = avatar;
+    if (phone !== undefined) user.phone = phone;
+    if (organization !== undefined) user.organization = organization;
+    if (isProfileComplete !== undefined) user.isProfileComplete = isProfileComplete;
+
+    await user.save();
+
+    // Return updated user without password
+    res.json({
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        avatar: user.avatar,
+        phone: user.phone,
+        organization: user.organization,
+        isProfileComplete: user.isProfileComplete,
+      },
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
 });
 
 export default router;

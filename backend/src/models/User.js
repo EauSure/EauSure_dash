@@ -24,6 +24,22 @@ const userSchema = new mongoose.Schema({
     enum: ['admin', 'user'],
     default: 'user',
   },
+  avatar: {
+    type: String,
+    default: null,
+  },
+  phone: {
+    type: String,
+    default: null,
+  },
+  organization: {
+    type: String,
+    default: null,
+  },
+  isProfileComplete: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

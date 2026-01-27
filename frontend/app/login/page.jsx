@@ -36,7 +36,14 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Email ou mot de passe invalide');
       } else {
-        router.push('/');
+        // Check if profile setup is needed
+        const session = await fetch('/api/auth/session').then(res => res.json());
+        
+        if (session?.user && !session.user.isProfileComplete) {
+          router.push('/profile/setup');
+        } else {
+          router.push('/');
+        }
         router.refresh();
       }
     } catch (err) {

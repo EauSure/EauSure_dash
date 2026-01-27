@@ -34,6 +34,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               email: data.user.email,
               name: data.user.name,
               role: data.user.role,
+              avatar: data.user.avatar,
+              phone: data.user.phone,
+              organization: data.user.organization,
+              isProfileComplete: data.user.isProfileComplete,
               accessToken: data.token,
             };
           }
@@ -50,14 +54,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         token.role = user.role;
+        // Don't store avatar in token to avoid header size issues
+        token.phone = user.phone;
+        token.organization = user.organization;
+        token.isProfileComplete = user.isProfileComplete;
         token.accessToken = user.accessToken;
       }
+      
+      // Handle session update (excluding avatar to prevent header overflow)
+      if (trigger === 'update' && session?.user) {
+        const { avatar, ...userData } = session.user;
+        token = { ...token, ...userData };
+      }
+      
       return token;
     },
     async session({ session, token }) {
@@ -66,6 +81,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.email = token.email;
         session.user.name = token.name;
         session.user.role = token.role;
+        // Avatar will be fetched separately to avoid session size issues
+        session.user.phone = token.phone;
+        session.user.organization = token.organization;
+        session.user.isProfileComplete = token.isProfileComplete;
+        session.user.token = token.accessToken;
         session.accessToken = token.accessToken;
       }
       return session;

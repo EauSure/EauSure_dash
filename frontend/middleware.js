@@ -5,15 +5,26 @@ export async function middleware(request) {
   const session = await auth();
   const isLoginPage = request.nextUrl.pathname === '/login';
   const isRegisterPage = request.nextUrl.pathname === '/register';
+  const isProfileSetup = request.nextUrl.pathname === '/profile/setup';
+  const isProfileEdit = request.nextUrl.pathname === '/profile/edit';
+  const isSettingsPage = request.nextUrl.pathname.startsWith('/settings');
 
-  // If not logged in and not on login or register page, redirect to login
+  // If not logged in and not on public pages, redirect to login
   if (!session && !isLoginPage && !isRegisterPage) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // If logged in and on login or register page, redirect to dashboard
+  // If logged in and on login or register page, redirect to dashboard or profile setup
   if (session && (isLoginPage || isRegisterPage)) {
+    if (!session.user.isProfileComplete) {
+      return NextResponse.redirect(new URL('/profile/setup', request.url));
+    }
     return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  // If logged in, profile incomplete, and not on profile setup/edit/settings page, redirect to profile setup
+  if (session && !session.user.isProfileComplete && !isProfileSetup && !isProfileEdit && !isSettingsPage) {
+    return NextResponse.redirect(new URL('/profile/setup', request.url));
   }
 
   return NextResponse.next();
