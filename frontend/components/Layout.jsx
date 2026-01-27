@@ -1,9 +1,17 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 
 export default function Layout({ children }) {
+  const pathname = usePathname();
+  const isAuthPage = pathname === '/login' || pathname === '/register';
+
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
       <Sidebar />

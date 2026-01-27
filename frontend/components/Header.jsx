@@ -1,28 +1,16 @@
 'use client';
 
-import { Bell, User } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { getAlerts } from '@/lib/api';
+import { User, LogOut, ChevronDown } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { useState } from 'react';
 
 export default function Header() {
-  const [notificationCount, setNotificationCount] = useState(0);
+  const { data: session } = useSession();
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  useEffect(() => {
-    // Poll for new alerts instead of WebSocket (Vercel compatible)
-    const checkAlerts = async () => {
-      try {
-        const alerts = await getAlerts({ acknowledged: false });
-        setNotificationCount(alerts.length);
-      } catch (error) {
-        console.error('Failed to fetch alerts:', error);
-      }
-    };
-
-    checkAlerts();
-    const interval = setInterval(checkAlerts, 30000); // Check every 30s
-
-    return () => clearInterval(interval);
-  }, []);
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/login' });
+  };
 
   return (
     <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6 shadow-sm">
@@ -32,16 +20,54 @@ export default function Header() {
         </h2>
       </div>
       <div className="flex items-center gap-3">
-        <button className="relative p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group">
-          <Bell className="w-5 h-5" />
-          {notificationCount > 0 && (
-            <span className="absolute top-1 right-1 w-5 h-5 bg-gradient-to-r from-red-500 to-rose-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse shadow-lg">{notificationCount}</span>
+        {/* User Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            className="flex items-center gap-3 p-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
+          >
+            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 flex items-center justify-center text-white font-semibold shadow-md">
+              {session?.user?.name?.[0]?.toUpperCase() || 'U'}
+            </div>
+            <div className="hidden md:block text-left">
+              <p className="text-sm font-semibold">{session?.user?.name || 'User'}</p>
+              <p className="text-xs text-gray-500">{session?.user?.role || 'user'}</p>
+            </div>
+            <ChevronDown
+              size={16}
+              className={`text-gray-400 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''}`}
+            />
+          </button>
+
+          {/* Dropdown Menu */}
+          {showDropdown && (
+            <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-2xl animate-fade-in z-50">
+              <div className="p-4 border-b border-gray-200">
+                <p className="font-semibold text-gray-800">{session?.user?.name}</p>
+                <p className="text-sm text-gray-500">{session?.user?.email}</p>
+                <span className="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700">
+                  {session?.user?.role || 'user'}
+                </span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-rose-50 hover:text-rose-600 transition-colors duration-200 rounded-b-xl"
+              >
+                <LogOut size={18} />
+                <span className="font-medium">Se déconnecter</span>
+              </button>
+            </div>
           )}
-        </button>
-        <button className="flex items-center gap-2 p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200">
-          <User className="w-5 h-5" />
-        </button>
+        </div>
       </div>
+
+      {/* Close dropdown when clicking outside */}
+      {showDropdown && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setShowDropdown(false)}
+        />
+      )}
     </header>
   );
 }

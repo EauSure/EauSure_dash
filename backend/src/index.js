@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 import waterQualityRouter from './routes/waterQuality.js';
 import devicesRouter from './routes/devices.js';
 import alertsRouter from './routes/alerts.js';
+import authRouter from './routes/auth.js';
 import { initMQTT } from './services/mqtt.js';
 import { initDatabase } from './services/database.js';
 import logger from './utils/logger.js';
@@ -24,6 +25,7 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
+app.use('/api/auth', authRouter);
 app.use('/api/water-quality', waterQualityRouter);
 app.use('/api/devices', devicesRouter);
 app.use('/api/alerts', alertsRouter);
@@ -40,6 +42,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     endpoints: {
       health: '/api/health',
+      auth: '/api/auth',
       waterQuality: '/api/water-quality',
       devices: '/api/devices',
       alerts: '/api/alerts'
