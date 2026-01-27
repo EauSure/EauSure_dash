@@ -1,7 +1,8 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+// Use relative path for same-origin API calls
+const API_URL = '/api';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
