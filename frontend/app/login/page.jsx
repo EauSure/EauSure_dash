@@ -37,6 +37,21 @@ function LoginForm() {
       });
 
       if (result?.error) {
+        // Check if error is due to unverified email
+        const loginResponse = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (loginResponse.status === 403) {
+          const data = await loginResponse.json();
+          if (data.requiresVerification) {
+            router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+            return;
+          }
+        }
+
         setError('Email ou mot de passe invalide');
       } else {
         // Check if profile setup is needed
@@ -116,9 +131,17 @@ function LoginForm() {
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                Mot de passe
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+                  Mot de passe
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-cyan-600 hover:text-cyan-700 font-semibold transition-colors"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Lock size={20} className="text-gray-400" />

@@ -4,8 +4,6 @@ import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
 export function useUserProfile() {
   const { data: session } = useSession();
   const [avatar, setAvatar] = useState(null);
@@ -13,15 +11,11 @@ export function useUserProfile() {
 
   useEffect(() => {
     const fetchAvatar = async () => {
-      if (!session?.user?.token) return;
+      if (!session?.user?.id) return;
       
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-          },
-        });
+        const response = await axios.get('/api/auth/profile');
         
         if (response.data.user?.avatar) {
           setAvatar(response.data.user.avatar);
@@ -34,7 +28,7 @@ export function useUserProfile() {
     };
 
     fetchAvatar();
-  }, [session?.user?.token]);
+  }, [session?.user?.id]);
 
   return {
     ...session,

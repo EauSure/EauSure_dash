@@ -103,13 +103,8 @@ export default function ProfileSetupPage() {
     setLoading(true);
 
     try {
-      const token = session?.user?.token;
-      if (!token) {
-        throw new Error('No authentication token');
-      }
-
       const response = await axios.put(
-        `${API_URL}/auth/profile`,
+        '/api/auth/profile',
         {
           name: formData.name,
           avatar: formData.avatar,
@@ -118,9 +113,6 @@ export default function ProfileSetupPage() {
           isProfileComplete: true,
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             setUploadProgress(percentCompleted);

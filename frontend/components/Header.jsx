@@ -15,7 +15,7 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6 shadow-sm">
+    <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6 shadow-sm relative z-50">
       <div className="flex-1">
         <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
           Tableau de Bord
@@ -23,7 +23,7 @@ export default function Header() {
       </div>
       <div className="flex items-center gap-3">
         {/* User Dropdown */}
-        <div className="relative">
+        <div className="relative z-50">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
             className="flex items-center gap-3 p-2.5 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 group"
@@ -53,7 +53,7 @@ export default function Header() {
 
           {/* Dropdown Menu */}
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-2xl animate-fade-in z-[99999]">
+            <div className="absolute right-0 mt-2 w-56 bg-white border-2 border-gray-200 rounded-xl shadow-2xl animate-fade-in z-[100]">
               <div className="p-4 border-b border-gray-200">
                 <p className="font-semibold text-gray-800">{user?.name}</p>
                 <p className="text-sm text-gray-500">{user?.email}</p>
@@ -84,7 +84,7 @@ export default function Header() {
       {/* Close dropdown when clicking outside */}
       {showDropdown && (
         <div
-          className="fixed inset-0 z-[99998]"
+          className="fixed inset-0 z-40"
           onClick={() => setShowDropdown(false)}
         />
       )}

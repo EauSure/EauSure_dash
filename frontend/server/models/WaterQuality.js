@@ -43,4 +43,4 @@ const WaterQualitySchema = new Schema(
 // Index for efficient time-based queries
 WaterQualitySchema.index({ deviceId: 1, timestamp: -1 });
 
-export default mongoose.model('WaterQuality', WaterQualitySchema);
+export default mongoose.models.WaterQuality || mongoose.model('WaterQuality', WaterQualitySchema);

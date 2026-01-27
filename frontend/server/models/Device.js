@@ -38,4 +38,4 @@ const DeviceSchema = new Schema(
   }
 );
 
-export default mongoose.model('Device', DeviceSchema);
+export default mongoose.models.Device || mongoose.model('Device', DeviceSchema);

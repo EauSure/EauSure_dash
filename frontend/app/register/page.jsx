@@ -24,6 +24,41 @@ export default function RegisterPage() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setError('');
+  };
+
+  const validatePassword = (password) => {
+    const minLength = 6;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+
+    if (password.length < minLength) {
+      return 'Le mot de passe doit contenir au moins 6 caractères';
+    }
+    if (!hasUpperCase || !hasLowerCase) {
+      return 'Le mot de passe doit contenir des majuscules et des minuscules';
+    }
+    if (!hasNumber) {
+      return 'Le mot de passe doit contenir au moins un chiffre';
+    }
+    return null;
+  };
+
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: 0, label: '', color: '' };
+    
+    let strength = 0;
+    if (password.length >= 6) strength++;
+    if (password.length >= 10) strength++;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    if (strength <= 2) return { strength: 1, label: 'Faible', color: 'bg-red-500' };
+    if (strength <= 3) return { strength: 2, label: 'Moyen', color: 'bg-yellow-500' };
+    if (strength <= 4) return { strength: 3, label: 'Fort', color: 'bg-green-500' };
+    return { strength: 4, label: 'Très fort', color: 'bg-emerald-500' };
   };
 
   const handleSubmit = async (e) => {
@@ -36,8 +71,9 @@ export default function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Le mot de passe doit contenir au moins 6 caractères');
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      setError(passwordError);
       return;
     }
 
@@ -45,7 +81,7 @@ export default function RegisterPage() {
 
     try {
       // Register user
-      const response = await fetch(`${API_URL}/auth/register`, {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,8 +99,8 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Erreur lors de l\'inscription');
       }
 
-      // Redirect to login page after successful registration
-      router.push('/login?registered=true');
+      // Redirect to email verification page
+      router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
     } catch (err) {
       setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
@@ -167,6 +203,45 @@ export default function RegisterPage() {
                   disabled={loading}
                 />
               </div>
+              
+              {/* Password Strength Indicator */}
+              {formData.password && (
+                <div className="mt-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-gray-600">Force du mot de passe:</span>
+                    <span className={`text-xs font-bold ${
+                      getPasswordStrength(formData.password).strength === 1 ? 'text-red-600' :
+                      getPasswordStrength(formData.password).strength === 2 ? 'text-yellow-600' :
+                      getPasswordStrength(formData.password).strength === 3 ? 'text-green-600' :
+                      'text-emerald-600'
+                    }`}>
+                      {getPasswordStrength(formData.password).label}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${getPasswordStrength(formData.password).color} transition-all duration-300`}
+                      style={{ width: `${(getPasswordStrength(formData.password).strength / 4) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Password Requirements */}
+              <div className="mt-3 space-y-2">
+                <p className="text-xs font-semibold text-gray-700">Le mot de passe doit contenir:</p>
+                <ul className="text-xs text-gray-600 space-y-1 ml-4">
+                  <li className={`flex items-center gap-2 ${formData.password.length >= 6 ? 'text-green-600' : ''}`}>
+                    {formData.password.length >= 6 ? '✓' : '○'} Au moins 6 caractères
+                  </li>
+                  <li className={`flex items-center gap-2 ${/[A-Z]/.test(formData.password) && /[a-z]/.test(formData.password) ? 'text-green-600' : ''}`}>
+                    {/[A-Z]/.test(formData.password) && /[a-z]/.test(formData.password) ? '✓' : '○'} Majuscules et minuscules
+                  </li>
+                  <li className={`flex items-center gap-2 ${/\d/.test(formData.password) ? 'text-green-600' : ''}`}>
+                    {/\d/.test(formData.password) ? '✓' : '○'} Au moins un chiffre
+                  </li>
+                </ul>
+              </div>
             </div>
 
             {/* Confirm Password Input */}
@@ -190,6 +265,9 @@ export default function RegisterPage() {
                   disabled={loading}
                 />
               </div>
+              {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                <p className="text-xs text-red-600 mt-2">Les mots de passe ne correspondent pas</p>
+              )}
             </div>
 
             {/* Submit Button */}

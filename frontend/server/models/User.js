@@ -40,6 +40,26 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationCode: {
+    type: String,
+    default: null,
+  },
+  verificationCodeExpires: {
+    type: Date,
+    default: null,
+  },
+  resetPasswordToken: {
+    type: String,
+    default: null,
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -80,6 +100,6 @@ userSchema.methods.toJSON = function () {
   return user;
 };
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 export default User;

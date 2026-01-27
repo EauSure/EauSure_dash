@@ -59,17 +59,20 @@ export default function Home() {
   const loadData = async () => {
     try {
       const result = await getWaterQualityData({ limit: 50 });
-      setData(result);
-      if (result.length > 0) {
-        setLatestData(result[0]);
+      // Ensure result is always an array
+      const dataArray = Array.isArray(result) ? result : [];
+      setData(dataArray);
+      if (dataArray.length > 0) {
+        setLatestData(dataArray[0]);
         // Check if device is online (data received in last 5 minutes)
-        const lastUpdate = new Date(result[0].timestamp);
+        const lastUpdate = new Date(dataArray[0].timestamp);
         const now = new Date();
         const diffMinutes = (now.getTime() - lastUpdate.getTime()) / (1000 * 60);
         setDeviceStatus(diffMinutes < 5 ? 'online' : 'offline');
       }
     } catch (error) {
       console.error('Failed to load data:', error);
+      setData([]);
       setDeviceStatus('offline');
     }
   };

@@ -6,7 +6,12 @@ import Header from '@/components/Header';
 
 export default function Layout({ children }) {
   const pathname = usePathname();
-  const isAuthPage = pathname === '/login' || pathname === '/register' || pathname === '/profile/setup';
+  const isAuthPage = pathname === '/login' 
+    || pathname === '/register' 
+    || pathname === '/profile/setup'
+    || pathname === '/forgot-password'
+    || pathname === '/reset-password'
+    || pathname === '/verify-email';
 
   if (isAuthPage) {
     return <>{children}</>;

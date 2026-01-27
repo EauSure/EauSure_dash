@@ -94,7 +94,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {settingsCategories.map((category, index) => {
             const Icon = category.icon;
-            const isAvailable = category.href === '/profile/edit';
+            const isAvailable = category.href === '/profile/edit' || category.href === '/settings/security';
 
             return (
               <Link

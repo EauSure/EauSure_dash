@@ -44,4 +44,4 @@ const AlertSchema = new Schema(
 // Index for efficient alert queries
 AlertSchema.index({ acknowledged: 1, severity: 1, timestamp: -1 });
 
-export default mongoose.model('Alert', AlertSchema);
+export default mongoose.models.Alert || mongoose.model('Alert', AlertSchema);
