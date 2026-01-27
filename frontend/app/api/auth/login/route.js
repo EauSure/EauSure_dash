@@ -23,7 +23,8 @@ export async function POST(request) {
     }
 
     // Find user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
+    
     if (!user) {
       return NextResponse.json(
         { error: 'Invalid credentials' },
@@ -33,6 +34,7 @@ export async function POST(request) {
 
     // Check password
     const isPasswordValid = await user.comparePassword(password);
+    
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: 'Invalid credentials' },
