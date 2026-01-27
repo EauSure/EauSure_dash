@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { LogIn, Mail, Lock, AlertCircle, Droplets, CheckCircle } from 'lucide-react';
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
