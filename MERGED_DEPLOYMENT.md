@@ -6,10 +6,20 @@
 - Backend code now lives in `frontend/server/` directory
 - API routes moved to `frontend/app/api/` as Next.js API routes
 - Everything runs on the same domain - no more cross-origin requests!
+- **The `backend/` folder is now obsolete** - you can delete it
 
-## 🚀 Vercel Deployment (Frontend Only)
+## 🚀 Vercel Deployment
 
-You now only need to deploy the **frontend** project. The backend is integrated!
+Deploy **ONLY the `frontend` folder**. The backend is integrated!
+
+### Vercel Configuration
+
+When importing to Vercel:
+1. Connect your GitHub repository
+2. **Set Root Directory to: `frontend`**
+3. Framework Preset: Next.js (auto-detected)
+4. Build Command: `npm run build` (auto-detected)
+5. Output Directory: `.next` (auto-detected)
 
 ### Step 1: Delete Old Backend Deployment (Optional)
 
