@@ -1,5 +1,5 @@
 import mqtt from 'mqtt';
-import logger from '../utils/logger.js';
+import logger from '../utils/logger';
 import { saveWaterQualityData, createAlert } from './database.js';
 
 let mqttClient = null;

@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import { createClient } from 'redis';
-import logger from '../utils/logger.js';
-import Device from '../models/Device.js';
-import WaterQuality from '../models/WaterQuality.js';
-import Alert from '../models/Alert.js';
+import logger from '../utils/logger';
+import Device from '../models/Device';
+import WaterQuality from '../models/WaterQuality';
+import Alert from '../models/Alert';
 
 // MongoDB connection
 const connectMongoDB = async () => {
