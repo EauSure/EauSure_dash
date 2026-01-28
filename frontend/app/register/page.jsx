@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { UserPlus, Mail, Lock, User, AlertCircle, Droplets, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';import Image from 'next/image';import { UserPlus, Mail, Lock, User, AlertCircle, Droplets, ArrowLeft } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -114,7 +113,7 @@ export default function RegisterPage() {
         {/* Logo and Title */}
         <div className="text-center mb-8 animate-fade-in">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-2xl mb-4">
-            <Droplets size={40} className="text-white" />
+            <Image src="/logo.svg" alt="Water Quality Logo" width={48} height={48} />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent mb-2">
             Water Quality

@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import Card from '@/components/Card';
 import { getWaterQualityData } from '@/lib/api';
 import { Droplets, Activity, AlertTriangle, Radio } from 'lucide-react';
+import { useAppearance } from '@/contexts/AppearanceContext';
 
 function MetricCard({ title, value, unit, icon, status }) {
   const statusStyles = {
@@ -42,6 +43,7 @@ function MetricCard({ title, value, unit, icon, status }) {
 }
 
 export default function Home() {
+  const { t } = useAppearance();
   const [data, setData] = useState([]);
   const [latestData, setLatestData] = useState(null);
   const [deviceStatus, setDeviceStatus] = useState('online');
@@ -92,8 +94,8 @@ export default function Home() {
   return (
     <div className="space-y-8 animate-fade-in">
       <div className="bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-2xl p-8 shadow-2xl text-white">
-        <h1 className="text-4xl font-bold mb-2">Surveillance de la Qualité de l'Eau</h1>
-        <p className="text-blue-100 text-lg">Système IoT pour puits et réservoirs profonds</p>
+        <h1 className="text-4xl font-bold mb-2">{t('water_quality')}</h1>
+        <p className="text-blue-100 text-lg">{t('iot_system_desc')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

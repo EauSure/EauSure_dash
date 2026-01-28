@@ -62,7 +62,7 @@ function LoginForm() {
         {/* Logo and Title */}
         <div className="text-center mb-8 animate-fade-in">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 shadow-2xl mb-4">
-            <Droplets size={40} className="text-white" />
+            <Image src="/logo.svg" alt="Water Quality Logo" width={48} height={48} />
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent mb-2">
             Water Quality

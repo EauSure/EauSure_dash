@@ -4,16 +4,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Radio, Bell, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
-
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home },
-  { name: 'Dispositifs', href: '/devices', icon: Radio },
-  { name: 'Alertes', href: '/alerts', icon: Bell },
-];
+import Image from 'next/image';
+import { useAppearance } from '@/contexts/AppearanceContext';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { t } = useAppearance();
+
+  const navigation = [
+    { name: t('nav_dashboard'), href: '/', icon: Home },
+    { name: t('nav_devices'), href: '/devices', icon: Radio },
+    { name: t('nav_alerts'), href: '/alerts', icon: Bell },
+  ];
 
   return (
     <div className={`flex flex-col bg-gradient-to-b from-slate-900 via-blue-900 to-cyan-900 border-r border-blue-800 shadow-2xl transition-all duration-300 ${
@@ -22,9 +25,12 @@ export default function Sidebar() {
       <div className="relative flex items-center h-16 px-4 border-b border-blue-800 bg-black/20">
         {!isCollapsed ? (
           <>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent whitespace-nowrap flex-1">
-              💧 Water Quality
-            </h1>
+            <div className="flex items-center gap-3 flex-1">
+              <Image src="/logo.svg" alt="Logo" width={32} height={32} className="flex-shrink-0" />
+              <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent whitespace-nowrap">
+                Water Quality
+              </h1>
+            </div>
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
               className="p-2 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0"
@@ -37,7 +43,7 @@ export default function Sidebar() {
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="w-full h-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer"
           >
-            <div className="text-2xl">💧</div>
+            <Image src="/logo.svg" alt="Logo" width={32} height={32} />
           </button>
         )}
       </div>

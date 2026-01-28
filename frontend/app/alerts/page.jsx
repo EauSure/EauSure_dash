@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import { getAlerts } from '@/lib/api';
 import { AlertTriangle, Droplet } from 'lucide-react';
+import { useAppearance } from '@/contexts/AppearanceContext';
 
 export default function AlertsPage() {
+  const { t } = useAppearance();
   const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function AlertsPage() {
       <Card title="Alertes système">
         <div className="space-y-3">
           {alerts.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">Aucune alerte active</p>
+            <p className="text-center text-gray-500 py-8">{t('no_alerts')}</p>
           ) : (
             alerts.map((alert) => (
               <div

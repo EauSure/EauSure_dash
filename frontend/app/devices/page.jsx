@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import { getDevices } from '@/lib/api';
 import { Radio, Battery, MapPin } from 'lucide-react';
+import { useAppearance } from '@/contexts/AppearanceContext';
 
 export default function DevicesPage() {
+  const { t } = useAppearance();
   const [devices, setDevices] = useState([]);
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export default function DevicesPage() {
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  {device.status === 'online' ? 'En ligne' : 'Hors ligne'}
+                  {device.status === 'online' ? t('device_online') : t('device_offline')}
                 </div>
               </div>
               <div className="space-y-2">

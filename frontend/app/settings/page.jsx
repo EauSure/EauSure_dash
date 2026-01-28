@@ -5,9 +5,11 @@ import { User, Bell, Shield, Palette, Database, Globe, ArrowLeft, ChevronRight }
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import { useAppearance } from '@/contexts/AppearanceContext';
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
+  const { t } = useAppearance();
 
   if (status === 'unauthenticated') {
     redirect('/login');
@@ -16,8 +18,8 @@ export default function SettingsPage() {
   const settingsCategories = [
     {
       icon: User,
-      title: 'Profil',
-      description: 'Modifier votre photo, nom, téléphone et organisation',
+      title: t('settings_profile'),
+      description: t('settings_profile_desc'),
       href: '/profile/edit',
       color: 'from-blue-500 to-cyan-500',
       bgColor: 'bg-blue-50',
@@ -25,8 +27,8 @@ export default function SettingsPage() {
     },
     {
       icon: Bell,
-      title: 'Notifications',
-      description: 'Gérer les alertes et notifications du système',
+      title: t('settings_notifications'),
+      description: t('settings_notifications_desc'),
       href: '/settings/notifications',
       color: 'from-purple-500 to-pink-500',
       bgColor: 'bg-purple-50',
@@ -34,8 +36,8 @@ export default function SettingsPage() {
     },
     {
       icon: Shield,
-      title: 'Sécurité',
-      description: 'Modifier le mot de passe et paramètres de sécurité',
+      title: t('settings_security'),
+      description: t('settings_security_desc'),
       href: '/settings/security',
       color: 'from-green-500 to-emerald-500',
       bgColor: 'bg-green-50',
@@ -43,8 +45,8 @@ export default function SettingsPage() {
     },
     {
       icon: Palette,
-      title: 'Apparence',
-      description: 'Personnaliser le thème et l\'affichage',
+      title: t('settings_appearance'),
+      description: t('settings_appearance_desc'),
       href: '/settings/appearance',
       color: 'from-orange-500 to-amber-500',
       bgColor: 'bg-orange-50',
@@ -52,8 +54,8 @@ export default function SettingsPage() {
     },
     {
       icon: Database,
-      title: 'Données',
-      description: 'Exporter ou supprimer vos données',
+      title: t('settings_data'),
+      description: t('settings_data_desc'),
       href: '/settings/data',
       color: 'from-indigo-500 to-blue-500',
       bgColor: 'bg-indigo-50',
@@ -61,8 +63,8 @@ export default function SettingsPage() {
     },
     {
       icon: Globe,
-      title: 'Langue et Région',
-      description: 'Choisir la langue et le fuseau horaire',
+      title: t('settings_language_region'),
+      description: t('settings_language_region_desc'),
       href: '/settings/language',
       color: 'from-teal-500 to-cyan-500',
       bgColor: 'bg-teal-50',
@@ -80,13 +82,13 @@ export default function SettingsPage() {
             className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-4"
           >
             <ArrowLeft size={20} />
-            <span className="font-medium">Retour au tableau de bord</span>
+            <span className="font-medium">{t('settings_back_dashboard')}</span>
           </Link>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent mb-2">
-            Paramètres
+            {t('settings_title')}
           </h1>
           <p className="text-gray-600">
-            Gérez vos préférences et paramètres du compte
+            {t('settings_subtitle')}
           </p>
         </div>
 
@@ -94,7 +96,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {settingsCategories.map((category, index) => {
             const Icon = category.icon;
-            const isAvailable = category.href === '/profile/edit' || category.href === '/settings/security';
+            const isAvailable = category.href === '/profile/edit' || category.href === '/settings/security' || category.href === '/settings/appearance';
 
             return (
               <Link
@@ -122,7 +124,7 @@ export default function SettingsPage() {
                       <ChevronRight className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" size={20} />
                     ) : (
                       <span className="text-xs font-normal text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
-                        Bientôt
+                        {t('coming_soon')}
                       </span>
                     )}
                   </h3>

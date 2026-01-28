@@ -1,6 +1,7 @@
 import "./globals.css";
 import Layout from "@/components/Layout";
 import { SessionProvider } from "next-auth/react";
+import { AppearanceProvider } from "@/contexts/AppearanceContext";
 
 export const metadata = {
   title: "Water Quality Monitoring Dashboard",
@@ -12,7 +13,9 @@ export default function RootLayout({ children }) {
     <html lang="fr">
       <body>
         <SessionProvider>
-          <Layout>{children}</Layout>
+          <AppearanceProvider>
+            <Layout>{children}</Layout>
+          </AppearanceProvider>
         </SessionProvider>
       </body>
     </html>

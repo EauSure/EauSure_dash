@@ -5,9 +5,11 @@ import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useAppearance } from '@/contexts/AppearanceContext';
 
 export default function Header() {
   const { user } = useUserProfile();
+  const { t } = useAppearance();
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleLogout = async () => {
@@ -18,7 +20,7 @@ export default function Header() {
     <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6 shadow-sm relative z-50">
       <div className="flex-1">
         <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-          Tableau de Bord
+          {t('nav_dashboard')}
         </h2>
       </div>
       <div className="flex items-center gap-3">
@@ -67,14 +69,14 @@ export default function Header() {
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 border-b border-gray-100"
               >
                 <Settings size={18} />
-                <span className="font-medium">Paramètres</span>
+                <span className="font-medium">{t('nav_settings')}</span>
               </Link>
               <button
                 onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 hover:bg-rose-50 hover:text-rose-600 transition-colors duration-200 rounded-b-xl"
               >
                 <LogOut size={18} />
-                <span className="font-medium">Se déconnecter</span>
+                <span className="font-medium">{t('nav_logout')}</span>
               </button>
             </div>
           )}
