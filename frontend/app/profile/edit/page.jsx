@@ -13,14 +13,14 @@ import { COUNTRY_CODES } from '@/lib/countries';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 const AVATAR_OPTIONS = [
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Bella',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Max',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver',
-  'https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie',
+  'https://api.dicebear.com/9.x/glass/svg?seed=Felix',
+  'https://api.dicebear.com/9.x/glass/svg?seed=Aneka',
+  'https://api.dicebear.com/9.x/glass/svg?seed=Bella',
+  'https://api.dicebear.com/9.x/glass/svg?seed=Charlie',
+  'https://api.dicebear.com/9.x/glass/svg?seed=Max',
+  'https://api.dicebear.com/9.x/glass/svg?seed=Luna',
+  'https://api.dicebear.com/9.x/glass/svg?seed=Oliver',
+  'https://api.dicebear.com/9.x/glass/svg?seed=Sophie',
 ];
 
 export default function ProfileEditPage() {
