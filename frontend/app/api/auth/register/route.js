@@ -1,16 +1,22 @@
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
-import { initDatabase } from '@/server/services/database';
+import mongoose from 'mongoose';
 import User from '@/server/models/User';
 import { sendVerificationEmail } from '@/server/services/email';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const JWT_EXPIRES_IN = '7d';
+
+// Ensure MongoDB connection
+async function connectDB() {
+  if (mongoose.connection.readyState === 0) {
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/water-quality-iot';
+    await mongoose.connect(mongoURI);
+  }
+}
 
 // POST /api/auth/register
 export async function POST(request) {
   try {
-    await initDatabase();
+    await connectDB();
 
     const body = await request.json();
     const { email, password, name, role } = body;
