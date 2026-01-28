@@ -175,11 +175,11 @@ export default function ProfileEditPage() {
         {/* Header */}
         <div className="mb-8">
           <Link 
-            href="/"
+            href="/settings"
             className="inline-flex items-center gap-2 text-gray-600 hover:text-cyan-600 font-medium mb-4 transition-colors"
           >
             <ArrowLeft size={20} />
-            Retour au tableau de bord
+            Retour aux paramètres
           </Link>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
             Modifier mon profil
