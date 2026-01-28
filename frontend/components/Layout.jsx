@@ -8,9 +8,7 @@ export default function Layout({ children }) {
   const pathname = usePathname();
   const isAuthPage = pathname === '/login' 
     || pathname === '/register' 
-    || pathname === '/profile/setup'
-    || pathname === '/forgot-password'
-    || pathname === '/reset-password';
+    || pathname === '/profile/setup';
 
   if (isAuthPage) {
     return <>{children}</>;
