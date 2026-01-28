@@ -37,21 +37,6 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        // Check if error is due to unverified email
-        const loginResponse = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
-
-        if (loginResponse.status === 403) {
-          const data = await loginResponse.json();
-          if (data.requiresVerification) {
-            router.push(`/verify-email?email=${encodeURIComponent(email)}`);
-            return;
-          }
-        }
-
         setError('Email ou mot de passe invalide');
       } else {
         // Check if profile setup is needed

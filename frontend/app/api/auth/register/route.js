@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import User from '@/server/models/User';
-import { sendVerificationEmail } from '@/server/services/email';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -64,35 +63,26 @@ export async function POST(request) {
       );
     }
 
-    // Generate verification code (6-digit number)
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
     // Create new user
     const user = new User({
       email: email.toLowerCase(),
       password,
       name,
       role: role || 'user',
-      emailVerified: false,
-      verificationCode,
-      verificationCodeExpires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+      emailVerified: true,
     });
 
     await user.save();
 
-    // Send verification email
-    try {
-      await sendVerificationEmail(user.email, verificationCode, user.name);
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-      // Continue with registration even if email fails
-    }
-
     return NextResponse.json(
       {
-        message: 'Compte créé avec succès. Veuillez vérifier votre email.',
-        email: user.email,
-        requiresVerification: true,
+        message: 'Compte créé avec succès.',
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
       },
       { status: 201 }
     );

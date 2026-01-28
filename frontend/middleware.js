@@ -7,13 +7,12 @@ export async function middleware(request) {
   const isRegisterPage = request.nextUrl.pathname === '/register';
   const isForgotPassword = request.nextUrl.pathname === '/forgot-password';
   const isResetPassword = request.nextUrl.pathname === '/reset-password';
-  const isVerifyEmail = request.nextUrl.pathname === '/verify-email';
   const isProfileSetup = request.nextUrl.pathname === '/profile/setup';
   const isProfileEdit = request.nextUrl.pathname === '/profile/edit';
   const isSettingsPage = request.nextUrl.pathname.startsWith('/settings');
 
   // Public pages that don't require authentication
-  const isPublicPage = isLoginPage || isRegisterPage || isForgotPassword || isResetPassword || isVerifyEmail;
+  const isPublicPage = isLoginPage || isRegisterPage || isForgotPassword || isResetPassword;
 
   // If not logged in and not on public pages, redirect to login
   if (!session && !isPublicPage) {

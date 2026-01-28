@@ -99,8 +99,8 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Erreur lors de l\'inscription');
       }
 
-      // Redirect to email verification page
-      router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+      // Redirect to login page after successful registration
+      router.push('/login?registered=true');
     } catch (err) {
       setError(err.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {

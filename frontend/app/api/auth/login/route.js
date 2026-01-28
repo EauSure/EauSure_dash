@@ -32,18 +32,6 @@ export async function POST(request) {
       );
     }
 
-    // Check if email is verified
-    if (!user.emailVerified) {
-      return NextResponse.json(
-        { 
-          error: 'Email non vérifié. Veuillez vérifier votre email.',
-          requiresVerification: true,
-          email: user.email 
-        },
-        { status: 403 }
-      );
-    }
-
     // Check password
     const isPasswordValid = await user.comparePassword(password);
     

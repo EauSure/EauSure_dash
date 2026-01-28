@@ -10,8 +10,7 @@ export default function Layout({ children }) {
     || pathname === '/register' 
     || pathname === '/profile/setup'
     || pathname === '/forgot-password'
-    || pathname === '/reset-password'
-    || pathname === '/verify-email';
+    || pathname === '/reset-password';
 
   if (isAuthPage) {
     return <>{children}</>;
