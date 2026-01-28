@@ -15,7 +15,7 @@ export default function Layout({ children }) {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="layout-bg flex h-screen">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />

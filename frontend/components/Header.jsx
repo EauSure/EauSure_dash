@@ -4,13 +4,31 @@ import { User, LogOut, ChevronDown, Settings } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAppearance } from '@/contexts/AppearanceContext';
 
 export default function Header() {
   const { user } = useUserProfile();
   const { t } = useAppearance();
+  const pathname = usePathname();
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const getPageTitle = () => {
+    if (pathname === '/') return t('nav_dashboard');
+    if (pathname === '/devices') return t('nav_devices');
+    if (pathname === '/alerts') return t('nav_alerts');
+    if (pathname === '/settings') return t('nav_settings');
+    if (pathname.startsWith('/settings/appearance')) return t('appearance_title');
+    if (pathname.startsWith('/settings/notifications')) return t('settings_notifications');
+    if (pathname.startsWith('/settings/security')) return t('settings_security');
+    if (pathname.startsWith('/settings/data')) return t('settings_data');
+    if (pathname.startsWith('/settings/language')) return t('settings_language');
+    if (pathname.startsWith('/profile/edit')) return t('settings_profile');
+    if (pathname.startsWith('/profile/setup')) return t('settings_profile');
+    if (pathname.startsWith('/profile')) return t('settings_profile');
+    return t('nav_dashboard');
+  };
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/login' });
@@ -20,7 +38,7 @@ export default function Header() {
     <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-200 flex items-center justify-between px-6 shadow-sm relative z-50">
       <div className="flex-1">
         <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-          {t('nav_dashboard')}
+          {getPageTitle()}
         </h2>
       </div>
       <div className="flex items-center gap-3">

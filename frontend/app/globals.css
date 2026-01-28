@@ -264,45 +264,55 @@ html.accent-red {
 .preserve-color,
 .preserve-color *,
 .preserve-color:hover,
-.preserve-color:hover * {
-  background-color: initial !important;
-  color: initial !important;
-  border-color: initial !important;
+.preserve-color:hover *,
+.preserve-color:focus,
+.preserve-color:active {
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.preserve-color {
+  background: white !important;
+}
+
+.preserve-color:hover {
+  background: white !important;
 }
 
 /* Apply accent colors to entire website */
 
-/* Sidebar gradients */
-.bg-gradient-to-b.from-slate-900.via-blue-900.to-cyan-900 {
-  background: linear-gradient(to bottom, #0f172a, var(--accent-dark), var(--accent-from)) !important;
+/* Sidebar styling - Light theme */
+.sidebar {
+  background: linear-gradient(to bottom, #ffffff, #f9fafb) !important;
 }
 
-/* Sidebar active states */
-.bg-gradient-to-r.from-cyan-500.to-blue-500 {
+.sidebar-title {
   background: linear-gradient(to right, var(--accent-from), var(--accent-to)) !important;
-}
-
-/* Header gradients and text */
-.bg-gradient-to-r.from-cyan-400.to-blue-400 {
-  background: linear-gradient(to right, var(--accent-light), var(--accent-from)) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
 }
 
-/* Icon colors in header */
-.text-cyan-400 {
-  color: var(--accent-light) !important;
+.sidebar-icon {
+  color: var(--accent-from) !important;
 }
 
-/* Border colors */
-.border-blue-800,
-.border-cyan-800 {
-  border-color: var(--accent-dark) !important;
+.sidebar-link-active {
+  background: linear-gradient(to right, var(--accent-from), var(--accent-to)) !important;
+}
+
+.sidebar-link:hover .sidebar-icon {
+  color: var(--accent-from) !important;
+}
+
+/* Layout background - Light theme with accent tint */
+.layout-bg {
+  background: linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0) !important;
 }
 
 /* Page background gradients */
 .bg-gradient-to-br.from-slate-50.via-blue-50.to-cyan-50 {
-  background: linear-gradient(to bottom right, #f8fafc, rgba(var(--accent-from), 0.1), rgba(var(--accent-to), 0.1)) !important;
+  background: linear-gradient(to bottom right, #f8fafc, #f1f5f9, #e2e8f0) !important;
 }
 
 /* Header icons and gradients */
@@ -340,6 +350,27 @@ html.accent-red {
 /* Shadows with color */
 .shadow-lg {
   box-shadow: 0 10px 15px -3px rgba(var(--accent-from), 0.1), 0 4px 6px -4px rgba(var(--accent-from), 0.1) !important;
+}
+
+/* Dashboard header gradient */
+.dashboard-header {
+  background: linear-gradient(to right, var(--accent-from), var(--accent-to)) !important;
+}
+
+.dashboard-subtitle {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Appearance page title with accent color */
+.appearance-icon {
+  background: linear-gradient(135deg, var(--accent-from), var(--accent-to)) !important;
+}
+
+.appearance-title {
+  background: linear-gradient(135deg, var(--accent-from), var(--accent-to)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
 }
 
 body {

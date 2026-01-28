@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';import Image from 'next/image';import { UserPlus, Mail, Lock, User, AlertCircle, Droplets, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { UserPlus, Mail, Lock, User, AlertCircle, Droplets, ArrowLeft } from 'lucide-react';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 

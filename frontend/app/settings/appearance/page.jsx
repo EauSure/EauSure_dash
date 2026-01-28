@@ -193,11 +193,11 @@ export default function AppearancePage() {
             <span className="font-medium">{t('appearance_back_settings')}</span>
           </Link>
           <div className="flex items-center gap-4 mb-2">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center shadow-lg">
+            <div className="appearance-icon w-14 h-14 rounded-xl flex items-center justify-center shadow-lg">
               <Palette className="text-white" size={28} />
             </div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-600 bg-clip-text text-transparent">
+              <h1 className="appearance-title text-4xl font-bold">
                 {t('appearance_title')}
               </h1>
               <p className="text-gray-600">
@@ -210,12 +210,11 @@ export default function AppearancePage() {
         <div className="space-y-6">
           {/* Theme Selection */}
           <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4">
               <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <Sun size={24} className="text-orange-600" />
                 {t('appearance_theme')}
               </h2>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{t('inspired_by')} {t('brand_github')}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {themes.map((themeOption) => {
@@ -242,42 +241,66 @@ export default function AppearancePage() {
 
           {/* Accent Colors */}
           <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-6">
               <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <Palette size={24} className="text-orange-600" />
                 {t('appearance_accent_color')}
               </h2>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{t('inspired_by')} {t('brand_github')}</span>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-              {accentColors.map((color) => (
-                <button
-                  key={color.id}
-                  onClick={() => setAccentColor(color.id)}
-                  className={`preserve-color group relative p-3 rounded-xl border-2 transition-all duration-300 ${
-                    accentColor === color.id
-                      ? `border-${color.id}-500 bg-${color.id}-50 shadow-md`
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
-                  }`}
-                >
-                  <div className={`preserve-color w-10 h-10 ${color.color} rounded-lg mx-auto mb-2 shadow-sm ${
-                    accentColor === color.id ? `ring-2 ${color.ring}` : ''
-                  }`}></div>
-                  <p className="text-xs font-semibold text-gray-800 text-center">{color.name}</p>
-                  <p className="text-[10px] text-gray-500 text-center mt-1">{color.brand}</p>
-                </button>
-              ))}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+              {accentColors.map((color) => {
+                const colorMap = {
+                  blue: '#3b82f6', purple: '#a855f7', green: '#22c55e', orange: '#f97316',
+                  pink: '#ec4899', indigo: '#6366f1', teal: '#14b8a6', red: '#ef4444'
+                };
+                const colorIcons = {
+                  blue: '💧', purple: '🍇', green: '🌿', orange: '🍊',
+                  pink: '🌸', indigo: '🌙', teal: '💎', red: '❤️'
+                };
+                const isSelected = accentColor === color.id;
+                return (
+                  <button
+                    key={color.id}
+                    onClick={() => setAccentColor(color.id)}
+                    className="preserve-color group relative p-5 rounded-2xl border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                    style={{
+                      backgroundColor: isSelected ? '#fafafa' : 'white',
+                      borderColor: isSelected ? colorMap[color.id] : '#e5e7eb',
+                      boxShadow: isSelected ? `0 4px 12px ${colorMap[color.id]}40` : '0 1px 3px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    <div className="relative">
+                      <div 
+                        className="preserve-color w-14 h-14 rounded-xl mx-auto mb-3 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 flex items-center justify-center"
+                        style={{
+                          backgroundColor: colorMap[color.id],
+                          boxShadow: isSelected ? `0 8px 16px ${colorMap[color.id]}60` : `0 4px 8px ${colorMap[color.id]}30`
+                        }}
+                      >
+                        <span className="text-2xl filter drop-shadow-lg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }}>
+                          {colorIcons[color.id]}
+                        </span>
+                        {isSelected && (
+                          <div className="absolute -top-1 -right-1 bg-white rounded-full p-0.5">
+                            <CheckCircle className="preserve-color" style={{ color: colorMap[color.id] }} size={18} />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-sm font-bold text-gray-800 text-center">{color.name}</p>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Density */}
           <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4">
               <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <Layout size={24} className="text-orange-600" />
                 {t('appearance_density')}
               </h2>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{t('inspired_by')} {t('brand_gmail')}/{t('brand_notion')}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {densityOptions.map((option) => (
@@ -296,8 +319,7 @@ export default function AppearancePage() {
                     <div className={`bg-gray-300 rounded h-3 w-1/2 ${option.spacing}`}></div>
                   </div>
                   <h3 className="font-bold text-gray-800 mb-1">{option.name}</h3>
-                  <p className="text-xs text-gray-600 mb-1">{option.description}</p>
-                  <p className="text-[10px] text-gray-500">{option.brand}</p>
+                  <p className="text-xs text-gray-600">{option.description}</p>
                 </button>
               ))}
             </div>
@@ -305,12 +327,11 @@ export default function AppearancePage() {
 
           {/* Font Size */}
           <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4">
               <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <Type size={24} className="text-orange-600" />
                 {t('appearance_font_size')}
               </h2>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{t('inspired_by')} {t('brand_apple')}</span>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {fontSizes.map((sizeOption) => (
@@ -333,12 +354,11 @@ export default function AppearancePage() {
 
           {/* Font Family */}
           <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4">
               <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <Type size={24} className="text-orange-600" />
                 {t('appearance_font_family')}
               </h2>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{t('inspired_by')} {t('brand_vscode')}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {fontFamilies.map((font) => (
@@ -355,7 +375,6 @@ export default function AppearancePage() {
                     The quick brown fox
                   </div>
                   <h3 className="font-bold text-gray-800">{font.name}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{font.brand}</p>
                 </button>
               ))}
             </div>
@@ -363,12 +382,11 @@ export default function AppearancePage() {
 
           {/* Language */}
           <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4">
               <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <Globe size={24} className="text-orange-600" />
                 {t('appearance_language')}
               </h2>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{t('inspired_by')} {t('brand_apple')}</span>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {languages.map((langOption) => (

@@ -12,13 +12,18 @@ export function useUserProfile() {
   useEffect(() => {
     const fetchAvatar = async () => {
       // Don't fetch if session is still loading or user is not authenticated
-      if (status === 'loading' || !session?.user?.id) return;
+      if (status === 'loading' || status === 'unauthenticated' || !session?.user?.id) {
+        return;
+      }
       
       // Don't fetch if we already have the avatar from session
       if (session?.user?.avatar) {
         setAvatar(session.user.avatar);
         return;
       }
+      
+      // Don't fetch if already loading
+      if (loading) return;
       
       try {
         setLoading(true);
@@ -30,7 +35,10 @@ export function useUserProfile() {
           setAvatar(response.data.user.avatar);
         }
       } catch (error) {
-        console.error('Failed to fetch user avatar:', error.response?.data?.error || error.message);
+        // Silently handle 404 - user might not have a profile yet
+        if (error.response?.status !== 404) {
+          console.error('Failed to fetch user avatar:', error.response?.data?.error || error.message);
+        }
         // Don't throw error, just use session avatar or null
         setAvatar(session?.user?.avatar || null);
       } finally {
@@ -39,7 +47,8 @@ export function useUserProfile() {
     };
 
     fetchAvatar();
-  }, [session?.user?.id, session?.user?.avatar, status]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id, status]);
 
   return {
     ...session,

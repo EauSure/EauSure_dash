@@ -4,9 +4,11 @@ import { ArrowLeft, Lock, Shield, Key, Smartphone, AlertTriangle, ChevronRight }
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
+import { useAppearance } from '@/contexts/AppearanceContext';
 
 export default function SecurityOptionsPage() {
   const { data: session, status } = useSession();
+  const { t } = useAppearance();
 
   if (status === 'unauthenticated') {
     redirect('/login');
@@ -15,8 +17,8 @@ export default function SecurityOptionsPage() {
   const securityOptions = [
     {
       icon: Lock,
-      title: 'Changer le mot de passe',
-      description: 'Modifier votre mot de passe actuel',
+      title: t('security_change_password'),
+      description: t('security_change_password_desc'),
       href: '/settings/security/change-password',
       color: 'from-green-500 to-emerald-500',
       bgColor: 'bg-green-50',
@@ -25,8 +27,8 @@ export default function SecurityOptionsPage() {
     },
     {
       icon: Smartphone,
-      title: 'Authentification à deux facteurs',
-      description: 'Ajouter une couche de sécurité supplémentaire',
+      title: t('security_2fa'),
+      description: t('security_2fa_desc'),
       href: '/settings/security/2fa',
       color: 'from-blue-500 to-cyan-500',
       bgColor: 'bg-blue-50',
@@ -35,8 +37,8 @@ export default function SecurityOptionsPage() {
     },
     {
       icon: Key,
-      title: 'Sessions actives',
-      description: 'Gérer les appareils connectés à votre compte',
+      title: t('security_sessions'),
+      description: t('security_sessions_desc'),
       href: '/settings/security/sessions',
       color: 'from-purple-500 to-pink-500',
       bgColor: 'bg-purple-50',
@@ -45,8 +47,8 @@ export default function SecurityOptionsPage() {
     },
     {
       icon: AlertTriangle,
-      title: 'Journal de sécurité',
-      description: 'Voir l\'historique des activités de connexion',
+      title: t('security_activity_log'),
+      description: t('security_activity_log_desc'),
       href: '/settings/security/activity-log',
       color: 'from-orange-500 to-amber-500',
       bgColor: 'bg-orange-50',
@@ -65,7 +67,7 @@ export default function SecurityOptionsPage() {
             className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-4"
           >
             <ArrowLeft size={20} />
-            <span className="font-medium">Retour aux paramètres</span>
+            <span className="font-medium">{t('security_back_settings')}</span>
           </Link>
           <div className="flex items-center gap-4 mb-2">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center shadow-lg">
@@ -73,10 +75,10 @@ export default function SecurityOptionsPage() {
             </div>
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                Sécurité
+                {t('security_title')}
               </h1>
               <p className="text-gray-600">
-                Protégez votre compte avec les paramètres de sécurité
+                {t('security_subtitle')}
               </p>
             </div>
           </div>
@@ -113,7 +115,7 @@ export default function SecurityOptionsPage() {
                       <ChevronRight className="text-gray-400 group-hover:text-green-600 group-hover:translate-x-1 transition-all" size={20} />
                     ) : (
                       <span className="text-xs font-normal text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
-                        Bientôt
+                        {t('coming_soon')}
                       </span>
                     )}
                   </h3>

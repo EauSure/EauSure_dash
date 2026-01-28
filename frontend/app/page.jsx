@@ -93,9 +93,9 @@ export default function Home() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-2xl p-8 shadow-2xl text-white">
+      <div className="dashboard-header bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-2xl p-8 shadow-2xl text-white">
         <h1 className="text-4xl font-bold mb-2">{t('water_quality')}</h1>
-        <p className="text-blue-100 text-lg">{t('iot_system_desc')}</p>
+        <p className="dashboard-subtitle text-blue-100 text-lg">{t('iot_system_desc')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

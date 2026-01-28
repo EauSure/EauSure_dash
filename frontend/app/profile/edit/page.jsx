@@ -9,6 +9,7 @@ import Link from 'next/link';
 import CountryCodeSelector from '@/components/CountryCodeSelector';
 import ImageCropper from '@/components/ImageCropper';
 import { COUNTRY_CODES } from '@/lib/countries';
+import { useAppearance } from '@/contexts/AppearanceContext';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -26,6 +27,7 @@ const AVATAR_OPTIONS = [
 export default function ProfileEditPage() {
   const { data: session, update } = useSession();
   const router = useRouter();
+  const { t } = useAppearance();
   const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -223,7 +225,7 @@ export default function ProfileEditPage() {
         },
       });
 
-      setSuccess('Profil mis à jour avec succès !');
+      setSuccess(t('profile_save_success'));
       setHasUnsavedChanges(false);
       
       // Update initial values to current values
@@ -239,7 +241,7 @@ export default function ProfileEditPage() {
         router.refresh();
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.error || 'Une erreur est survenue');
+      setError(err.response?.data?.error || t('profile_save_error'));
     } finally {
       setLoading(false);
     }
@@ -256,12 +258,12 @@ export default function ProfileEditPage() {
             className="inline-flex items-center gap-2 text-gray-600 hover:text-cyan-600 font-medium mb-4 transition-colors"
           >
             <ArrowLeft size={20} />
-            Retour aux paramètres
+            {t('profile_back_settings')}
           </Link>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
-            Modifier mon profil
+            {t('profile_edit_title')}
           </h1>
-          <p className="text-gray-600 mt-2">Mettez à jour vos informations personnelles</p>
+          <p className="text-gray-600 mt-2">{t('profile_edit_subtitle')}</p>
         </div>
 
         {/* Edit Card */}
@@ -286,7 +288,7 @@ export default function ProfileEditPage() {
           {loading && uploadProgress > 0 && uploadProgress < 100 && (
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Upload en cours...</span>
+                <span className="text-sm font-medium text-gray-700">{t('profile_upload_progress')}</span>
                 <span className="text-sm text-gray-500">{uploadProgress}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2.5">

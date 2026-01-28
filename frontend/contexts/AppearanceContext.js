@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getTranslation } from '@/lib/translations';
+import { getTranslation, getTranslationSync } from '@/lib/autoTranslations';
 
 const AppearanceContext = createContext();
 
@@ -143,7 +143,24 @@ export function AppearanceProvider({ children }) {
 
   // Create translation function that depends on language state
   const t = useCallback((key) => {
-    return getTranslation(language, key);
+    return getTranslationSync(key, language);
+  }, [language]);
+
+  // Preload translations for current language in background
+  useEffect(() => {
+    if (language !== 'fr') {
+      // Preload common translations
+      const commonKeys = [
+        'nav_dashboard', 'nav_devices', 'nav_alerts', 'nav_settings',
+        'save', 'cancel', 'back', 'loading'
+      ];
+      
+      commonKeys.forEach(key => {
+        getTranslation(key, language).catch(err => 
+          console.error('Translation preload error:', err)
+        );
+      });
+    }
   }, [language]);
 
   const value = {
