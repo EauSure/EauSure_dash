@@ -5,9 +5,17 @@ import User from '@/server/models/User';
 
 // Ensure MongoDB connection
 async function connectDB() {
-  if (mongoose.connection.readyState === 0) {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/water-quality-iot';
-    await mongoose.connect(mongoURI);
+  try {
+    if (mongoose.connection.readyState === 0) {
+      const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/water-quality-iot';
+      await mongoose.connect(mongoURI, {
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+      });
+    }
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    throw error;
   }
 }
 
@@ -25,7 +33,12 @@ export async function GET(request) {
 
     await connectDB();
     
-    const user = await User.findById(session.user.id).select('-password');
+    // Add timeout to the query
+    const user = await User.findById(session.user.id)
+      .select('-password')
+      .maxTimeMS(5000)
+      .lean()
+      .exec();
     
     if (!user) {
       return NextResponse.json(
@@ -37,8 +50,17 @@ export async function GET(request) {
     return NextResponse.json({ user });
   } catch (error) {
     console.error('Profile fetch error:', error);
+    
+    // Return more specific error messages
+    if (error.name === 'MongooseError' || error.name === 'MongoServerError') {
+      return NextResponse.json(
+        { error: 'Database connection failed', details: error.message },
+        { status: 503 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch profile' },
+      { error: 'Failed to fetch profile', details: error.message },
       { status: 500 }
     );
   }
